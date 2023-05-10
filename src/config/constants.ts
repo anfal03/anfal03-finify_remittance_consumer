@@ -1,0 +1,10 @@
+import { SetMetadata } from '@nestjs/common';
+export const DEVELOPMENT = 'development';
+export const TEST = 'test';
+export const PRODUCTION = 'production';
+export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
+export const AGENTPROFILE_REPOSITORY = 'AGENTPROFILE_REPOSITORY';
+export const TRANSACTION_REPOSITORY = 'TRANSACTION_REPOSITORY';
+export const JSONRX_REPOSITORY = 'JSONRX_REPOSITORY';
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
