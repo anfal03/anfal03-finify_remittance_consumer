@@ -3,7 +3,8 @@ import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiModel } from './agentbanking.interface';
 import axios from 'axios';
-import { AmlCheckDto } from './dto/create-agent.dto';
+
+import { KafkaDto } from './dto/kafka.dto';
 @Injectable()
 export class ThirdpartyapiService {
   constructor(
@@ -96,13 +97,38 @@ export class ThirdpartyapiService {
         Retry: 0,
       };
   }
-  async GetAmlConfirmResponse(amlcheckDto : AmlCheckDto)
-  {
-
+  async GetAmlConfirmResponse(kafkaDto: KafkaDto) {
     return await axios({
-      url: `${process.env.JSONRX_URL}`,
+      url: `${process.env.PAYMENTPRODUCER_URL}`,
       method: 'POST',
-      data: amlcheckDto,
+      data: kafkaDto,
+      headers: {
+        module: process.env.AUTH_MODULE,
+        'Content-type': 'application/json',
+      },
+      timeout: 3000,
+    })
+      .then(function (response) {
+        console.log(response.data);
+        return response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return {
+          TransactionId: '',
+          ResponseCode: 999,
+          ResponseDescriptioon: 'REQUEST TIME OUT',
+          ServieUrl: process.env.JSONRX_URL,
+          Retry: 3,
+        };
+      });
+    //JSONRX_URL
+  }
+  async OffnetProcess(kafkaDto: KafkaDto) {
+    return await axios({
+      url: `${process.env.OFFNET_URL}`,
+      method: 'POST',
+      data: kafkaDto,
       headers: {
         module: process.env.AUTH_MODULE,
         'Content-type': 'application/json',

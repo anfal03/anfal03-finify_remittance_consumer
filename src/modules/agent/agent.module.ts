@@ -32,9 +32,10 @@ import { HttpModule } from '@nestjs/axios';
             // ssl: true,
             brokers: [process.env.KAFKA_BROKERS],
           },
-          // consumer: {
-          //   groupId: process.env.KAFKA_GROUP_ID,
-          // },
+          consumer: {
+            groupId: process.env.KAFKA_GROUP_ID,
+            allowAutoTopicCreation: true, 
+          },
         },
       },
     ]),
