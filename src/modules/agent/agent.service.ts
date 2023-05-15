@@ -62,9 +62,7 @@ export class AgentService {
     const transectionId = `${year}${month}${date}${hour}${minit}${seconds}${milliseconds}`;
     return transectionId;
   }
-  async create(createAgentDto: CreateAgentDto) {
-    return 'This action adds a new agent';
-  }
+
 
   async withdrawal(createAgentDto: CreateAgentDto) {
     return 'WITHDRAWAL';
@@ -74,13 +72,20 @@ export class AgentService {
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
       const callingpaymentprocessor =
         this.thirdpartyService.OffnetProcess(kafkadto);
-      winstonLog.log('info', 'CALLED OFFNET');
+      winstonLog.log(
+        'debug',
+        'CALLED OFFNET %s',
+        JSON.stringify(callingpaymentprocessor),
+      );
     } else {
       const callingpaymentprocessor =
         this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
+        winstonLog.log(
+          'debug',
+          'TRANSACTION PROCESS %s',
+        JSON.stringify(callingpaymentprocessor),
+        );
     }
-
-    
   }
   // async sendService(sendUSSDDto: SendUSSDDto) {
   //   const checkpin = await this.passwordService.PINVerify(
@@ -171,20 +176,5 @@ export class AgentService {
   // }
   async offnetwithdrawal(offnetWithdrawDto: OffnetWithdrawalDto) {
     return 'offnet';
-  }
-  findAll() {
-    return `This action returns all agent`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} agent`;
-  }
-
-  update(id: number, updateAgentDto: UpdateAgentDto) {
-    return `This action updates a #${id} agent`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} agent`;
   }
 }

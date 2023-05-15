@@ -8,6 +8,7 @@ import {
   IsInt,
   IsString,
   Length,
+  IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -51,4 +52,7 @@ export class KafkaDto {
   @IsNotEmpty()
   @ApiProperty()
   readonly TransactionId: string;
+  @IsOptional()
+  @ApiProperty()
+  readonly OTP: string;
 }
