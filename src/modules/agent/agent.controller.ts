@@ -38,13 +38,7 @@ export class AgentController {
   // @Post('/offnetwithdrawwithregistration')
   // offnetregistration(@Body() createAgentbankingDto: CreateAgentDto) {
   //   return this.agentbankingService.create(createAgentbankingDto);
-  // }
-  @UseGuards(AuthmodeAuthGuard)
-  @Post('/send')
-  async Send(@Body() sendUSSDDto: SendUSSDDto) {
-    // return this.agentbankingService.sendService(sendUSSDDto);
-    return '';
-  }
+
 
   @MessagePattern('payment.req')
   async readMessage(message: Record<string, any>): Promise<void>{
