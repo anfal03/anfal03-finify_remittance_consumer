@@ -63,7 +63,6 @@ export class AgentService {
     return transectionId;
   }
 
-
   async withdrawal(createAgentDto: CreateAgentDto) {
     return 'WITHDRAWAL';
   }
@@ -77,14 +76,22 @@ export class AgentService {
         'CALLED OFFNET %s',
         JSON.stringify(callingpaymentprocessor),
       );
+    } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
+      const callingpaymentprocessor =
+        this.thirdpartyService.OffnetCashoutProcess(kafkadto);
+      winstonLog.log(
+        'debug',
+        'CALLED OFFNET cashout  %s',
+        JSON.stringify(callingpaymentprocessor),
+      );
     } else {
       const callingpaymentprocessor =
         this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
-        winstonLog.log(
-          'debug',
-          'TRANSACTION PROCESS %s',
+      winstonLog.log(
+        'debug',
+        'TRANSACTION PROCESS %s',
         JSON.stringify(callingpaymentprocessor),
-        );
+      );
     }
   }
   // async sendService(sendUSSDDto: SendUSSDDto) {

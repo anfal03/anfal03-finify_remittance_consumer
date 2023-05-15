@@ -151,4 +151,31 @@ export class ThirdpartyapiService {
       });
     //JSONRX_URL
   }
+  async OffnetCashoutProcess(kafkaDto: KafkaDto) {
+    return await axios({
+      url: `${process.env.OFFNET_CASHOUT_URL}`,
+      method: 'POST',
+      data: kafkaDto,
+      headers: {
+        module: process.env.AUTH_MODULE,
+        'Content-type': 'application/json',
+      },
+      timeout: 3000,
+    })
+      .then(function (response) {
+        console.log(response.data);
+        return response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return {
+          TransactionId: '',
+          ResponseCode: 999,
+          ResponseDescriptioon: 'REQUEST TIME OUT',
+          ServieUrl: process.env.OFFNET_CASHOUT_URL,
+          Retry: 3,
+        };
+      });
+    //JSONRX_URL
+  }
 }
