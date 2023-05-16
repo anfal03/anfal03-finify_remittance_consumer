@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ digicash-uat ]
+    branches: [ digicash-prod ]
   pull_request:
-    branches: [ digicash-uat ]
+    branches: [ digicash-prod ]
 
 jobs:
 
@@ -34,7 +34,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/digicash-finify-remit-consumer-uat:${{github.run_number}} 
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/digicash-finify-remit-consumer-prod:${{github.run_number}} 
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
