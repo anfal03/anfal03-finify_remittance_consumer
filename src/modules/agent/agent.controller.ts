@@ -12,9 +12,11 @@ import {
   KafkaContext,
   MessagePattern,
   Payload,
+  EventPattern,
 } from '@nestjs/microservices';
 import { winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
+import { Consumer, KafkaClient } from 'kafka-node';
 @Controller('transfer')
 export class AgentController {
   constructor(private readonly agentbankingService: AgentService) {}
@@ -41,9 +43,26 @@ export class AgentController {
 
 
   @MessagePattern('payment.req')
-  async readMessage(message: Record<string, any>): Promise<void>{
-    const kafkdto: KafkaDto = Object.assign(new KafkaDto(), message);
-    winstonLog.log('info', 'REQUEST: %s', JSON.stringify(message));
-    this.agentbankingService.transactionService(kafkdto);
+  // async readMessage(message: Record<string, any>): Promise<void>{
+  //   const kafkdto: KafkaDto = Object.assign(new KafkaDto(), message);
+  //   winstonLog.log('info', 'REQUEST: %s', JSON.stringify(message));
+  //   this.agentbankingService.transactionService(kafkdto);
+  // }
+ // @EventPattern('payment.req')
+  async readMessage(
+    @Payload() payload: any,
+    @Ctx() context: KafkaContext,
+  ): Promise<void> {
+
+    const income = context.getMessage();
+
+    const kafkdto: KafkaDto = Object.assign(new KafkaDto(), income.value);
+    winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto));
+      this.agentbankingService.transactionService(kafkdto);
+
+    
+
+
+  //  this.agentbankingService.transactionService(kafkdto);
   }
 }
