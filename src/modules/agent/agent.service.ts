@@ -70,18 +70,27 @@ export class AgentService {
     winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto));
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
       const callingpaymentprocessor =
-        this.thirdpartyService.OffnetProcess(kafkadto);
+        await this.thirdpartyService.OffnetProcess(kafkadto);
       winstonLog.log(
         'debug',
         'CALLED OFFNET %s',
         JSON.stringify(callingpaymentprocessor),
       );
+      const kafkaresponse = this.client.emit(
+        process.env.KAFKA_NOTIFICATION_TOPIC,
+        JSON.stringify(callingpaymentprocessor),
+      );
+      winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
     } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
       const callingpaymentprocessor =
-        this.thirdpartyService.OffnetCashoutProcess(kafkadto);
+        await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
       winstonLog.log(
         'debug',
         'CALLED OFFNET cashout  %s',
+        JSON.stringify(callingpaymentprocessor),
+      );
+      const kafkaresponse = this.client.emit(
+        process.env.KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
     } else {
