@@ -110,7 +110,7 @@ export class AgentController {
   }
 
   // @Cron(CronExpression.EVERY_30_SECONDS)
-    @Cron('0 10 18  * * *')
+    @Cron('0 30 12  * * *')
     // @Cron('0 1/2 * * * *')
     // @Post("/kafakjs-pause")
     async pauseConsumer(@Payload() data: any): Promise<void> {
@@ -122,7 +122,7 @@ export class AgentController {
     }
 
     // @Cron(CronExpression.EVERY_MINUTE)
-    @Cron('0 25 18 * * * *')
+    @Cron('0 40 12 * * * *')
     // @Cron('0 */2 * * * *')
     // @Post("/kafakjs-resume")
     async resumeConsumer(@Payload() data: any): Promise<void> {
