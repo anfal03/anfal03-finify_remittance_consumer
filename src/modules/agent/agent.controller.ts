@@ -55,7 +55,7 @@ export class AgentController {
   //   return this.agentbankingService.create(createAgentbankingDto);
 
 
-  @MessagePattern('payment.req')
+  // @MessagePattern('payment.req')
   // async readMessage(message: Record<string, any>): Promise<void>{
   //   const kafkdto: KafkaDto = Object.assign(new KafkaDto(), message);
   //   winstonLog.log('info', 'REQUEST: %s', JSON.stringify(message));
