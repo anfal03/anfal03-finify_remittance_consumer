@@ -9,6 +9,8 @@ import { userProviders } from './agent.providers';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
+import { ScheduleModule } from '@nestjs/schedule';
+
 @Module({
   controllers: [AgentController],
   providers: [
@@ -42,6 +44,7 @@ import { HttpModule } from '@nestjs/axios';
         },
       },
     ]),
+    ScheduleModule.forRoot(),
   ],
   exports: [ThirdpartyapiService, AmlService, PasswordService, AgentService],
 })
