@@ -193,4 +193,20 @@ export class AgentService {
   async offnetwithdrawal(offnetWithdrawDto: OffnetWithdrawalDto) {
     return 'offnet';
   }
+
+  async callDailyBalanceSheetProcedure(){
+
+    // const CurrentDate = (datetime=new Date())=>{return datetime.toISOString().split('T')[0]}
+
+    const datetime = new Date()
+
+    datetime.setDate(datetime.getDate() + 1)
+
+    const CurrentDate = datetime.toISOString().split('T')[0]
+
+    console.log(CurrentDate);
+    
+    await this.DB.query(`EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `)
+
+  }
 }

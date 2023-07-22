@@ -109,26 +109,22 @@ export class AgentController {
     });
   }
 
-  // @Cron(CronExpression.EVERY_30_SECONDS)
-    @Cron('0 20 14 * * *')
-    // @Cron('0 1/2 * * * *')
-    // @Post("/kafakjs-pause")
+    @Cron(process.env.KAFKA_CONSUMER_PAUSE_TIME)
     async pauseConsumer(@Payload() data: any): Promise<void> {
-      const now = new Date().toISOString ()
 
-      console.log("pausing at" + now);
+      winstonLog.log('info', 'pausing topic: %s', process.env.KAFKA_REQ_TOPIC );
 
       await this.consumer.pause([{ topic: process.env.KAFKA_REQ_TOPIC }]);
+
+      await this.agentbankingService.callDailyBalanceSheetProcedure()
+
     }
 
-    // @Cron(CronExpression.EVERY_MINUTE)
-    @Cron('0 30 14 * * *')
-    // @Cron('0 */2 * * * *')
-    // @Post("/kafakjs-resume")
+    @Cron(process.env.KAFKA_CONSUMER_RESUME_TIME)
     async resumeConsumer(@Payload() data: any): Promise<void> {
-      const now = new Date().toISOString ()
-      console.log("resuming at" + now);
-      
+
+      winstonLog.log('info', 'resuming topic: %s', process.env.KAFKA_REQ_TOPIC );
+
       await this.consumer.resume([{ topic: process.env.KAFKA_REQ_TOPIC }]);
     }
 
