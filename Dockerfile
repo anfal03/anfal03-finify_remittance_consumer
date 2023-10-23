@@ -30,8 +30,8 @@ RUN npm install webpack
 RUN npm link webpack
 #RUN npm install --only=production
 
-COPY . .
+COPY .env ./
 
 COPY --from=development /nestjs_core/dist ./dist
-
+EXPOSE 5009
 CMD ["node", "dist/main"]
