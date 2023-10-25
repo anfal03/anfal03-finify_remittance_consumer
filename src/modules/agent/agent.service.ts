@@ -17,7 +17,7 @@ import {
 import { Sequelize } from 'sequelize-typescript';
 import { PasswordService } from './password.service';
 import { ThirdpartyapiService } from './thirdpartyapi.service';
-import winston from 'winston/lib/winston/config';
+
 import { winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
 @Injectable()
@@ -194,19 +194,19 @@ export class AgentService {
     return 'offnet';
   }
 
-  async callDailyBalanceSheetProcedure(){
-
+  async callDailyBalanceSheetProcedure() {
     // const CurrentDate = (datetime=new Date())=>{return datetime.toISOString().split('T')[0]}
 
-    const datetime = new Date()
+    const datetime = new Date();
 
-    datetime.setDate(datetime.getDate() + 1)
+    datetime.setDate(datetime.getDate() + 1);
 
-    const CurrentDate = datetime.toISOString().split('T')[0]
+    const CurrentDate = datetime.toISOString().split('T')[0];
 
     console.log(CurrentDate);
-    
-    await this.DB.query(`EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `)
 
+    await this.DB.query(
+      `EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `,
+    );
   }
 }

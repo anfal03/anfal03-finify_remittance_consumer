@@ -29,6 +29,7 @@ export interface AmlModel {
   SOURCE_WALLET: bigint;
   DESTINATION_WALLET: bigint;
 }
+
 export interface Notification_Template {
   KEYWORD: string;
   TemplateID: string;

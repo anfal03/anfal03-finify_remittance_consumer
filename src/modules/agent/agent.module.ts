@@ -10,6 +10,10 @@ import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AgentbankingService } from './agentbanking.service';
+import { OffnetprocessService } from './offnetprocess.service';
+import { OffnetCashOutService } from './offnetcashout.service';
+import { PaymentService } from './payment.service';
 
 @Module({
   controllers: [AgentController],
@@ -18,6 +22,10 @@ import { ScheduleModule } from '@nestjs/schedule';
     AmlService,
     PasswordService,
     ThirdpartyapiService,
+    AgentbankingService,
+    OffnetprocessService,
+    OffnetCashOutService,
+    PaymentService,
     ...userProviders,
     Logger,
   ],
@@ -36,16 +44,25 @@ import { ScheduleModule } from '@nestjs/schedule';
           },
           consumer: {
             groupId: process.env.KAFKA_GROUP_ID,
-            allowAutoTopicCreation: true, 
+            allowAutoTopicCreation: true,
           },
           run: {
             autoCommit: true,
-          }
+          },
         },
       },
     ]),
     ScheduleModule.forRoot(),
   ],
-  exports: [ThirdpartyapiService, AmlService, PasswordService, AgentService],
+  exports: [
+    ThirdpartyapiService,
+    AmlService,
+    PasswordService,
+    AgentService,
+    AgentbankingService,
+    OffnetprocessService,
+    OffnetCashOutService,
+    PaymentService,
+  ],
 })
 export class AgentModule {}

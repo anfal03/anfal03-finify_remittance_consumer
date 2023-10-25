@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 export interface ResponseModel {
   Source_Wallet_ID: number;
   Amount: number;
@@ -43,4 +44,7 @@ export interface Notification_Template {
   TransectionId: string;
   Issuccess : boolean;
   Is_Financial: string;
+  FullName: string;
+  Charge: string;
+  Commission: string;
 }
