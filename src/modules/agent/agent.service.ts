@@ -63,9 +63,7 @@ export class AgentService {
     return transectionId;
   }
 
-  async withdrawal(createAgentDto: CreateAgentDto) {
-    return 'WITHDRAWAL';
-  }
+
   async transactionService(kafkadto: KafkaDto) {
     winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto));
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
