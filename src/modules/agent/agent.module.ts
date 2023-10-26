@@ -15,6 +15,7 @@ import { OffnetprocessService } from './offnetprocess.service';
 import { OffnetCashOutService } from './offnetcashout.service';
 import { PaymentService } from './payment.service';
 import { BonuseService } from './bonus.service';
+import { PaymentApiCallService } from './paymentapicall.service';
 
 @Module({
   controllers: [AgentController],
@@ -28,6 +29,7 @@ import { BonuseService } from './bonus.service';
     OffnetCashOutService,
     BonuseService,
     PaymentService,
+    PaymentApiCallService,
     ...userProviders,
     Logger
   ],
@@ -66,6 +68,7 @@ import { BonuseService } from './bonus.service';
     OffnetCashOutService,
     PaymentService,
     BonuseService,
+    PaymentApiCallService,
   ],
 })
 export class AgentModule {}

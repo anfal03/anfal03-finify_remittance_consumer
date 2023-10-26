@@ -1,13 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CreatePaymentDto, CommitPaymentDto } from './dto/create-payment.dto';
 import { AmlService } from './aml.service';
-import { ThirdpartyapiService } from './thirdpartyapi.service';
+
 import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { Notification_Template } from './payment.interface';
 import { ClientKafka } from '@nestjs/microservices';
 import { winstonLog } from '../../config/winstonLog';
 import { BonuseService } from './bonus.service';
+import { PaymentApiCallService } from './paymentapicall.service';
 
 @Injectable()
 export class PaymentService {
@@ -16,7 +17,7 @@ export class PaymentService {
     //  private readonly userRepository: typeof PaymentModel,
 
     private readonly amlService: AmlService,
-    private readonly thirdpartyService: ThirdpartyapiService,
+    private readonly thirdpartyService: PaymentApiCallService,
     private readonly bonuseservice: BonuseService,
     @Inject(DATABASE_CONNECTION) private DB: Sequelize,
     @Inject('kafka_module') private readonly client: ClientKafka,
