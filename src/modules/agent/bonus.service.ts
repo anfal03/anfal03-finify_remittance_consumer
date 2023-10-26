@@ -1,6 +1,6 @@
 import { ClientKafka } from '@nestjs/microservices';
 import { winstonLog } from '../../config/winstonLog';
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Injectable()

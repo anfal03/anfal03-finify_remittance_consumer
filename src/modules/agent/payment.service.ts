@@ -1,11 +1,7 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreatePaymentDto, CommitPaymentDto } from './dto/create-payment.dto';
-
-
-
 import { AmlService } from './aml.service';
 import { ThirdpartyapiService } from './thirdpartyapi.service';
-
 import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { Notification_Template } from './payment.interface';
@@ -23,9 +19,7 @@ export class PaymentService {
     private readonly thirdpartyService: ThirdpartyapiService,
     private readonly bonuseservice: BonuseService,
     @Inject(DATABASE_CONNECTION) private DB: Sequelize,
-    private readonly logger: Logger,
-    @Inject('kafka_module')
-    private readonly client: ClientKafka,
+    @Inject('kafka_module') private readonly client: ClientKafka,
   ) {}
   private notificationtemplate: Notification_Template;
   //   async findAll() {
@@ -242,7 +236,7 @@ export class PaymentService {
       process.env.KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
-    this.logger.debug('KAFKARESPONSE:', JSON.stringify(kafkaresponse));
+    winstonLog.log('debug','KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
   }
   async bonus(Transaction_ID: string, createPaymentDto: CreatePaymentDto) {
     const request = {
@@ -252,12 +246,12 @@ export class PaymentService {
       Amount: createPaymentDto.Amount,
       Keyword: createPaymentDto.Keyword,
     };
-    this.logger.log('Messeage Send -> ' + JSON.stringify(request));
+    winstonLog.log('info', 'Messeage Send %s ', JSON.stringify(request));
     const kafkaresponse = this.client.emit(
       process.env.KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
-    this.logger.debug('KAFKARESPONSE:', JSON.stringify(kafkaresponse));
+    winstonLog.log('debug', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
   }
   async bonusLeg2(createPaymentDto: CommitPaymentDto) {
     const request = {
@@ -267,12 +261,12 @@ export class PaymentService {
       Amount: createPaymentDto.Amount,
       Keyword: createPaymentDto.Keyword,
     };
-    this.logger.log('Messeage Send -> ' + JSON.stringify(request));
+    winstonLog.log('info', 'Messeage Send -> %s', JSON.stringify(request));
     const kafkaresponse = this.client.emit(
       process.env.KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
-    this.logger.debug('KAFKARESPONSE:', JSON.stringify(kafkaresponse));
+    winstonLog.log('debug','KAFKARESPONSE: %s', JSON.stringify(kafkaresponse));
   }
   //Payment Processing Function Starts
   async ProcessPayment(
@@ -291,7 +285,7 @@ export class PaymentService {
 
     //IF AML OK
     if (AML.Code == 100) {
-      this.logger.log('AMLCHECK:', AML.Msg);
+      winstonLog.log('info','AMLCHECK: %s', AML.Msg);
       const AMLPERSONAL = await this.amlService.AmlCheckPersonal(
         createPaymentDto.Source_Wallet_ID,
         createPaymentDto.Dest_Wallet_ID,
@@ -301,9 +295,7 @@ export class PaymentService {
       if (AMLPERSONAL.Code == 100) {
         switch (Flag) {
           case 'DIRECT':
-            this.logger.debug(
-              `EXEC SW_PROC_TRANSACTION_BANKING @Transaction_ID=${Transaction_Id},@Flag=${Flag},@Source_Wallet_ID=${createPaymentDto.Source_Wallet_ID},@Dest_Wallet_ID=${createPaymentDto.Dest_Wallet_ID},@Amount=${createPaymentDto.Amount},@Keyword=${createPaymentDto.Keyword},@Transaction_Fee=${createPaymentDto.Transaction_Fee},@Transaction_Comm=${createPaymentDto.Transaction_Comm},@Reference_ID='${createPaymentDto.Reference_ID}',@Charge_Payer= ${createPaymentDto.Charge_Payer} , @Currency = ${createPaymentDto.Currency} , @Comission_Receiver = ${createPaymentDto.Comission_Receiver}`,
-            );
+         
             const direct = JSON.parse(
               JSON.stringify(
                 await this.DB.query(

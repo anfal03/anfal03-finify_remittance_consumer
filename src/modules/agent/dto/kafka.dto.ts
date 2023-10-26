@@ -1,15 +1,4 @@
-import {
-  IsNotEmpty,
-  MinLength,
-  IsEmail,
-  IsEnum,
-  isEmpty,
-  isBoolean,
-  IsInt,
-  IsString,
-  Length,
-  IsOptional,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class KafkaDto {

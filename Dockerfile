@@ -1,4 +1,4 @@
-FROM node:14-alpine AS development
+FROM node:18-alpine AS development
 
 # Create app directory
 WORKDIR /nestjs_core
@@ -16,7 +16,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:14-alpine as production
+FROM node:18-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}

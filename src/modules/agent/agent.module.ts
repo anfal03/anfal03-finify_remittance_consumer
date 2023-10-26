@@ -6,14 +6,15 @@ import { PasswordService } from './password.service';
 import { ThirdpartyapiService } from './thirdpartyapi.service';
 import { AmlService } from './aml.service';
 import { userProviders } from './agent.providers';
-import { ClientsModule } from '@nestjs/microservices';
-import { Transport } from '@nestjs/microservices';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+
 import { HttpModule } from '@nestjs/axios';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AgentbankingService } from './agentbanking.service';
 import { OffnetprocessService } from './offnetprocess.service';
 import { OffnetCashOutService } from './offnetcashout.service';
 import { PaymentService } from './payment.service';
+import { BonuseService } from './bonus.service';
 
 @Module({
   controllers: [AgentController],
@@ -25,9 +26,10 @@ import { PaymentService } from './payment.service';
     AgentbankingService,
     OffnetprocessService,
     OffnetCashOutService,
+    BonuseService,
     PaymentService,
     ...userProviders,
-    Logger,
+    Logger
   ],
   imports: [
     DatabaseModule,
@@ -63,6 +65,7 @@ import { PaymentService } from './payment.service';
     OffnetprocessService,
     OffnetCashOutService,
     PaymentService,
+    BonuseService,
   ],
 })
 export class AgentModule {}

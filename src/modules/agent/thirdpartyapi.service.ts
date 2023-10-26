@@ -3,9 +3,7 @@ import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiModel } from './agentbanking.interface';
 import axios from 'axios';
-
 import { KafkaDto } from './dto/kafka.dto';
-import { OffnetprocessService } from './offnetprocess.service';
 import { AgentbankingService } from './agentbanking.service';
 import { PaymentService } from './payment.service';
 @Injectable()
