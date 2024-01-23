@@ -205,7 +205,7 @@ export class AgentService {
 
     console.log(CurrentDate);
 
-    const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${CurrentDate}' `)
+    const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `)
 
 
     if (result[0][0]['rows'] < 1) {
