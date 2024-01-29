@@ -192,35 +192,35 @@ export class AgentService {
     return 'offnet';
   }
 
-  async callDailyBalanceSheetProcedure() {
-    // const CurrentDate = (datetime=new Date())=>{return datetime.toISOString().split('T')[0]}
+  // async callDailyBalanceSheetProcedure() {
+  //   // const CurrentDate = (datetime=new Date())=>{return datetime.toISOString().split('T')[0]}
 
-    const datetime = new Date();
-    const datetime2 = new Date();
+  //   const datetime = new Date();
+  //   const datetime2 = new Date();
 
-    datetime.setDate(datetime.getDate() + 1);
+  //   datetime.setDate(datetime.getDate() + 1);
 
-    const CurrentDate = datetime.toISOString().split('T')[0];
-    const PastCurrentDate = datetime2.toISOString().split('T')[0];
+  //   const CurrentDate = datetime.toISOString().split('T')[0];
+  //   const PastCurrentDate = datetime2.toISOString().split('T')[0];
 
-    console.log(CurrentDate);
+  //   console.log(CurrentDate);
 
-    const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `)
+  //   const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `)
 
 
-    if (result[0][0]['rows'] < 1) {
-      //calling SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}'
-      winstonLog.log('info', `calling SW_JOB_PROC_DAILY_BALANCE_SHEET for balance sheet of : '${PastCurrentDate}' `);
+  //   if (result[0][0]['rows'] < 1) {
+  //     //calling SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}'
+  //     winstonLog.log('info', `calling SW_JOB_PROC_DAILY_BALANCE_SHEET for balance sheet of : '${PastCurrentDate}' `);
 
-      const start_result = await this.DB.query(`INSERT INTO [dbo].[balancesheet_runtime] ([start_date_time],[input_date]) VALUES (getdate(),'${CurrentDate}');`)
+  //     const start_result = await this.DB.query(`INSERT INTO [dbo].[balancesheet_runtime] ([start_date_time],[input_date]) VALUES (getdate(),'${CurrentDate}');`)
 
-         await this.DB.query(
-        `EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `,
-      );
+  //        await this.DB.query(
+  //       `EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `,
+  //     );
 
-      const end_result = await this.DB.query(`UPDATE [dbo].[balancesheet_runtime] SET [end_date_time] = getdate() WHERE ([dbo].[balancesheet_runtime].[input_date] = '${CurrentDate}')`)
+  //     const end_result = await this.DB.query(`UPDATE [dbo].[balancesheet_runtime] SET [end_date_time] = getdate() WHERE ([dbo].[balancesheet_runtime].[input_date] = '${CurrentDate}')`)
 
-    }
+  //   }
     
-  }
+  // }
 }

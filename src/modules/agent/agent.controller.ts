@@ -71,19 +71,19 @@ export class AgentController {
     });
   }
 
-  @Cron(process.env.KAFKA_CONSUMER_PAUSE_TIME)
-  async pauseConsumer(@Payload() data: any): Promise<void> {
-    winstonLog.log('info', 'pausing topic: %s', process.env.KAFKA_REQ_TOPIC);
+  // @Cron(process.env.KAFKA_CONSUMER_PAUSE_TIME)
+  // async pauseConsumer(@Payload() data: any): Promise<void> {
+  //   winstonLog.log('info', 'pausing topic: %s', process.env.KAFKA_REQ_TOPIC);
 
-    await this.consumer.pause([{ topic: process.env.KAFKA_REQ_TOPIC }]);
+  //   await this.consumer.pause([{ topic: process.env.KAFKA_REQ_TOPIC }]);
 
-    await this.agentbankingService.callDailyBalanceSheetProcedure();
-  }
+  //   await this.agentbankingService.callDailyBalanceSheetProcedure();
+  // }
 
-  @Cron(process.env.KAFKA_CONSUMER_RESUME_TIME)
-  async resumeConsumer(@Payload() data: any): Promise<void> {
-    winstonLog.log('info', 'resuming topic: %s', process.env.KAFKA_REQ_TOPIC);
+  // @Cron(process.env.KAFKA_CONSUMER_RESUME_TIME)
+  // async resumeConsumer(@Payload() data: any): Promise<void> {
+  //   winstonLog.log('info', 'resuming topic: %s', process.env.KAFKA_REQ_TOPIC);
 
-    await this.consumer.resume([{ topic: process.env.KAFKA_REQ_TOPIC }]);
-  }
+  //   await this.consumer.resume([{ topic: process.env.KAFKA_REQ_TOPIC }]);
+  // }
 }
