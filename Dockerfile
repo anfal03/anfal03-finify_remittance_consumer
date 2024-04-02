@@ -9,7 +9,7 @@ RUN npm install glob rimraf
 
 RUN npm install
 RUN npm install webpack
-RUN npm link webpack
+#RUN npm link webpack
 #RUN npm install --only=development
 
 COPY . .
@@ -27,7 +27,7 @@ COPY package*.json ./
 
 RUN npm install
 RUN npm install webpack
-RUN npm link webpack
+#RUN npm link webpack
 #RUN npm install --only=production
 
 COPY . .
