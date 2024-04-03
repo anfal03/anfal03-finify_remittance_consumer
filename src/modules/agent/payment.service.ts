@@ -174,6 +174,11 @@ export class PaymentService {
       process.env.KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
+    const accountingresponse = await this.client.emit(
+      process.env.KAFKA_ACCOUNTING_TOPIC,
+      JSON.stringify(this.notificationtemplate),
+    );
+    winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse);
   }
   async sendfailnotification(
     createPaymentDto: CreatePaymentDto,
@@ -237,7 +242,7 @@ export class PaymentService {
       process.env.KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
-    winstonLog.log('debug','KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
+    winstonLog.log('debug', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
   }
   async bonus(Transaction_ID: string, createPaymentDto: CreatePaymentDto) {
     const request = {
@@ -267,7 +272,7 @@ export class PaymentService {
       process.env.KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
-    winstonLog.log('debug','KAFKARESPONSE: %s', JSON.stringify(kafkaresponse));
+    winstonLog.log('debug', 'KAFKARESPONSE: %s', JSON.stringify(kafkaresponse));
   }
   //Payment Processing Function Starts
   async ProcessPayment(
@@ -286,7 +291,7 @@ export class PaymentService {
 
     //IF AML OK
     if (AML.Code == 100) {
-      winstonLog.log('info','AMLCHECK: %s', AML.Msg);
+      winstonLog.log('info', 'AMLCHECK: %s', AML.Msg);
       const AMLPERSONAL = await this.amlService.AmlCheckPersonal(
         createPaymentDto.Source_Wallet_ID,
         createPaymentDto.Dest_Wallet_ID,
@@ -296,7 +301,6 @@ export class PaymentService {
       if (AMLPERSONAL.Code == 100) {
         switch (Flag) {
           case 'DIRECT':
-         
             const direct = JSON.parse(
               JSON.stringify(
                 await this.DB.query(

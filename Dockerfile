@@ -1,4 +1,4 @@
-FROM node:14-alpine AS development
+FROM node:18.18.0 AS development
 
 # Create app directory
 WORKDIR /nestjs_core
@@ -9,14 +9,14 @@ RUN npm install glob rimraf
 
 RUN npm install
 RUN npm install webpack
-RUN npm link webpack
+#RUN npm link webpack
 #RUN npm install --only=development
 
 COPY . .
 
 RUN npm run build
 
-FROM node:14-alpine as production
+FROM node:18.18.0 as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -27,11 +27,11 @@ COPY package*.json ./
 
 RUN npm install
 RUN npm install webpack
-RUN npm link webpack
+#RUN npm link webpack
 #RUN npm install --only=production
 
-COPY .env ./
+COPY . .
 
 COPY --from=development /nestjs_core/dist ./dist
-EXPOSE 5009
+
 CMD ["node", "dist/main"]
