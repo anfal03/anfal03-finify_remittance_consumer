@@ -7,14 +7,15 @@ import { KafkaDto } from './dto/kafka.dto';
 
 import { Kafka } from 'kafkajs';
 import { Cron } from '@nestjs/schedule';
+import { CustomLogger } from '../../common/logger/logger.service';
 @Controller('transfer')
 export class AgentController {
   private kafka: Kafka;
   private consumer: any;
 
-  constructor(private readonly agentbankingService: AgentService) {
+  constructor(private readonly agentbankingService: AgentService, private readonly logger: CustomLogger,) {
     this.kafka = new Kafka({
-      clientId: 'my-kafka-app',
+      clientId: 'finify_remittance_consumer',
       brokers: [process.env.KAFKA_BROKERS],
     });
 
@@ -31,7 +32,7 @@ export class AgentController {
     const income = context.getMessage();
 
     const kafkdto: KafkaDto = Object.assign(new KafkaDto(), income.value);
-    winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto));
+    this.logger.log ('REQUEST:'+ JSON.stringify(kafkdto));
     this.agentbankingService.transactionService(kafkdto);
 
     //  this.agentbankingService.transactionService(kafkdto);
@@ -56,7 +57,7 @@ export class AgentController {
         console.log(buf);
 
         const kafkdto: KafkaDto = Object.assign(new KafkaDto(), buf);
-        winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto));
+        this.logger.log('REQUEST: %s'+ JSON.stringify(kafkdto));
         await this.consumer.commitOffsets([
           {
             topic,
@@ -73,17 +74,17 @@ export class AgentController {
 
   @Cron(process.env.KAFKA_CONSUMER_PAUSE_TIME)
   async pauseConsumer(@Payload() data: any): Promise<void> {
-    winstonLog.log('info', 'pausing topic: %s', process.env.KAFKA_REQ_TOPIC);
+    winstonLog.log('info', 'pausing topic: %s', process.env.KAFKA_MAIN_TOPIC);
 
-    await this.consumer.pause([{ topic: process.env.KAFKA_REQ_TOPIC }]);
+    await this.consumer.pause([{ topic: process.env.KAFKA_MAIN_TOPIC }]);
 
     await this.agentbankingService.callDailyBalanceSheetProcedure();
   }
 
   @Cron(process.env.KAFKA_CONSUMER_RESUME_TIME)
   async resumeConsumer(@Payload() data: any): Promise<void> {
-    winstonLog.log('info', 'resuming topic: %s', process.env.KAFKA_REQ_TOPIC);
+    winstonLog.log('info', 'resuming topic: %s', process.env.KAFKA_MAIN_TOPIC);
 
-    await this.consumer.resume([{ topic: process.env.KAFKA_REQ_TOPIC }]);
+    await this.consumer.resume([{ topic: process.env.KAFKA_MAIN_TOPIC }]);
   }
 }

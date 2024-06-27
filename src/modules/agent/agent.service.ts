@@ -20,6 +20,7 @@ import { ThirdpartyapiService } from './thirdpartyapi.service';
 
 import { winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
+import { CustomLogger } from '../../common/logger/logger.service';
 @Injectable()
 export class AgentService {
   constructor(
@@ -34,6 +35,7 @@ export class AgentService {
     private readonly client: ClientKafka,
     private readonly passwordService: PasswordService,
     private readonly thirdpartyService: ThirdpartyapiService,
+    private readonly logger: CustomLogger,
   ) {}
   //KAFKA CONNECT
   async onModuleInit() {
@@ -65,20 +67,20 @@ export class AgentService {
 
 
   async transactionService(kafkadto: KafkaDto) {
-    winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto));
+    this.logger.log('KAFKABODY: '+ JSON.stringify(kafkadto));
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
       const callingpaymentprocessor =
         await this.thirdpartyService.OffnetProcess(kafkadto);
-      winstonLog.log(
-        'debug',
-        'CALLED OFFNET %s',
+      this.logger.log(
+        
+        'CALLED OFFNET:'+
         JSON.stringify(callingpaymentprocessor),
       );
       const kafkaresponse = this.client.emit(
         process.env.KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
-      winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
+      this.logger.log( 'KAFKARESPONSE:'+ JSON.stringify(kafkaresponse));
     } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
       const callingpaymentprocessor =
         await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
@@ -94,9 +96,9 @@ export class AgentService {
     } else {
       const callingpaymentprocessor =
         this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
-      winstonLog.log(
-        'debug',
-        'TRANSACTION PROCESS %s',
+     this.logger.log(
+       
+        'TRANSACTION PROCESS %s'+
         JSON.stringify(callingpaymentprocessor),
       );
     }

@@ -16,6 +16,7 @@ import { OffnetCashOutService } from './offnetcashout.service';
 import { PaymentService } from './payment.service';
 import { BonuseService } from './bonus.service';
 import { PaymentApiCallService } from './paymentapicall.service';
+import { CustomLogger } from '../../common/logger/logger.service';
 
 @Module({
   controllers: [AgentController],
@@ -31,7 +32,8 @@ import { PaymentApiCallService } from './paymentapicall.service';
     PaymentService,
     PaymentApiCallService,
     ...userProviders,
-    Logger
+    Logger,
+    CustomLogger,
   ],
   imports: [
     DatabaseModule,

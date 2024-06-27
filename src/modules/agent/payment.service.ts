@@ -9,6 +9,7 @@ import { ClientKafka } from '@nestjs/microservices';
 import { winstonLog } from '../../config/winstonLog';
 import { BonuseService } from './bonus.service';
 import { PaymentApiCallService } from './paymentapicall.service';
+import { CustomLogger } from '../../common/logger/logger.service';
 
 @Injectable()
 export class PaymentService {
@@ -21,6 +22,7 @@ export class PaymentService {
     private readonly bonuseservice: BonuseService,
     @Inject(DATABASE_CONNECTION) private DB: Sequelize,
     @Inject('kafka_module') private readonly client: ClientKafka,
+    private readonly logger: CustomLogger,
   ) {}
   private notificationtemplate: Notification_Template;
   //   async findAll() {
@@ -100,9 +102,9 @@ export class PaymentService {
       createPaymentDto,
       createPaymentDto.TransactionId,
     ); // Insert Transaction request to SW_TBL_TRANSACTION_REQUEST table
-    winstonLog.log(
-      'info',
-      'TRANSACTION ENTRY : %s',
+    this.logger.log(
+   
+      'TRANSACTION ENTRY : '+
       JSON.stringify(createPaymentDto),
     );
     //Checking if it is a special transaction or direct
@@ -113,12 +115,12 @@ export class PaymentService {
       const Flag2 = await this.CheckDestinationType(
         createPaymentDto.Source_Wallet_ID,
       );
-      winstonLog.log(
-        'info',
-        'TransactionId: %s , DestinationFlag: %s, SourceFlag: %s',
-        createPaymentDto.TransactionId,
-        Flag,
-        Flag2,
+      this.logger.log(
+    
+        'TransactionId: %s , DestinationFlag: %s, SourceFlag: %s'+
+        createPaymentDto.TransactionId+
+        Flag+
+        Flag2+
       );
 
       if (Flag == 'DIRECT') {
