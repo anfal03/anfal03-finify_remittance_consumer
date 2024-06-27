@@ -102,11 +102,7 @@ export class PaymentService {
       createPaymentDto,
       createPaymentDto.TransactionId,
     ); // Insert Transaction request to SW_TBL_TRANSACTION_REQUEST table
-    this.logger.log(
-   
-      'TRANSACTION ENTRY : '+
-      JSON.stringify(createPaymentDto),
-    );
+    this.logger.log('TRANSACTION ENTRY : ' + JSON.stringify(createPaymentDto));
     //Checking if it is a special transaction or direct
     if (Transaction.ResponseCode == 100) {
       const Flag = await this.CheckDestinationType(
@@ -116,11 +112,10 @@ export class PaymentService {
         createPaymentDto.Source_Wallet_ID,
       );
       this.logger.log(
-    
-        'TransactionId: %s , DestinationFlag: %s, SourceFlag: %s'+
-        createPaymentDto.TransactionId+
-        Flag+
-        Flag2+
+        'TransactionId: %s , DestinationFlag: %s, SourceFlag: %s' +
+          createPaymentDto.TransactionId +
+          Flag +
+          Flag2,
       );
 
       if (Flag == 'DIRECT') {
@@ -180,7 +175,7 @@ export class PaymentService {
       process.env.KAFKA_ACCOUNTING_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
-    winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse);
+    winstonLog.log('info', 'KAFKA MESSAGE: %s', accountingresponse);
   }
   async sendfailnotification(
     createPaymentDto: CreatePaymentDto,
