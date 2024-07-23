@@ -3,16 +3,14 @@ import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { ApiModel } from './agentbanking.interface';
 import axios from 'axios';
-import { KafkaDto } from './dto/kafka.dto';
-import { AgentbankingService } from './agentbanking.service';
-import { PaymentService } from './payment.service';
+
+
 @Injectable()
-export class ThirdpartyapiService {
+export class PaymentApiCallService {
   constructor(
     @Inject(DATABASE_CONNECTION) private DB: Sequelize,
     private readonly logger: Logger,
-    private readonly agenbankingService: AgentbankingService,
-    private readonly paymentService: PaymentService,
+
   ) {}
   async CheckServiceUrl(MSISDN_SOURCE: string, MSISDN_DESTINATION: string) {
     const payload = JSON.parse(
@@ -155,13 +153,8 @@ export class ThirdpartyapiService {
   //   //JSONRX_URL
   // }
 
-  async GetAmlConfirmResponse(kafkaDto: KafkaDto){
-    return this.paymentService.Transaction(kafkaDto);
-  }
 
-  async OffnetProcess(kafkaDto: KafkaDto) {
-    return this.agenbankingService.offnetprocess(kafkaDto);
-  }
+
   // async OffnetCashoutProcess(kafkaDto: KafkaDto) {
   //   return await axios({
   //     url: `${process.env.OFFNET_CASHOUT_URL}`,
@@ -189,8 +182,6 @@ export class ThirdpartyapiService {
   //     });
   //   //JSONRX_URL
   // }
-  async OffnetCashoutProcess(kafkaDto: KafkaDto) {
-    return this.agenbankingService.create(kafkaDto);
-  }
+
 
 }

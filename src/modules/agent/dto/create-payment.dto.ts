@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-export class KafkaDto {
+export class CreatePaymentDto {
   @IsNotEmpty()
   @ApiProperty()
   readonly Keyword: string;
@@ -9,39 +8,42 @@ export class KafkaDto {
   @IsNotEmpty()
   @ApiProperty()
   readonly Source_Wallet_ID: string;
-  @IsNotEmpty()
+  @ApiProperty()
+  readonly TransactionId: string;
   @ApiProperty()
   readonly Dest_Wallet_ID: string;
   @ApiProperty()
-  readonly Dest_Wallet_Fullname: string;
-  @IsNotEmpty()
-  @ApiProperty()
   readonly Amount: string;
-  @IsNotEmpty()
   @ApiProperty()
   readonly Transaction_Fee: string;
-  @IsNotEmpty()
   @ApiProperty()
   readonly Transaction_Comm: string;
-  @IsNotEmpty()
   @ApiProperty()
   readonly Charge_Payer: bigint;
   @ApiProperty()
   readonly Currency: string;
   @ApiProperty()
   readonly Reference_ID: string;
-  @IsNotEmpty()
   @ApiProperty()
   readonly Comission_Receiver: bigint;
   @ApiProperty()
   readonly Language: string;
+}
+
+export class CommitPaymentDto {
   @IsNotEmpty()
   @ApiProperty()
-  readonly PIN: string;
+  readonly Transaction_ID: string;
+
   @IsNotEmpty()
   @ApiProperty()
-  readonly TransactionId: string;
-  @IsOptional()
+  readonly Source_Wallet_ID: string;
+  @IsNotEmpty()
   @ApiProperty()
-  readonly OTP: string;
+  readonly Dest_Wallet_ID: string;
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly Amount: string;
+  @ApiProperty()
+  readonly Keyword: string;
 }

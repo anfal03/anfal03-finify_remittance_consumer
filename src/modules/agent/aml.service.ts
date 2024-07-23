@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
-import { AmlModel } from './agentbanking.interface';
-
+import { AmlModel } from './payment.interface';
+import { winstonLog } from '../../config/winstonLog';
 @Injectable()
 export class AmlService {
   constructor(@Inject(DATABASE_CONNECTION) private DB: Sequelize) {}
@@ -17,7 +17,7 @@ export class AmlService {
       `EXEC dbo.SW_PROC_AML_CHECK @MSISDN = ${Source_Wallet_ID},@Keyword = ${Keyword} ,@Amount = ${Amount} , @Dest_Wallet_ID = ${Dest_Wallet_ID}   `,
     );
     const data = JSON.parse(JSON.stringify(payload));
-
+    winstonLog.log('debug','GLOBAL AML CHECK: %s', JSON.stringify(payload));
     return data[0][0];
   }
 
@@ -31,7 +31,7 @@ export class AmlService {
       `EXEC dbo.SW_PROC_AML_CHECK_PERSONAL @MSISDN = ${Source_Wallet_ID},@Keyword = ${Keyword} ,@Amount = ${Amount} , @Dest_Wallet_ID = ${Dest_Wallet_ID}   `,
     );
     const data = JSON.parse(JSON.stringify(payload));
-
+    winstonLog.log('debug','PERSONAL AML CHECK: %s', JSON.stringify(payload));
     return data[0][0];
   }
 }

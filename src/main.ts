@@ -8,6 +8,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as i18n from 'i18n';
 
 import 'dotenv/config';
+import { CustomLogger } from './common/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -29,7 +30,7 @@ async function bootstrap() {
   );
 
 
-
+  app.useLogger(app.get(CustomLogger));
   // expressBind(app, { locales: ['en'] });
 
   // app.use(localize);

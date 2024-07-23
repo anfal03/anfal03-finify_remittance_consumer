@@ -17,9 +17,10 @@ import {
 import { Sequelize } from 'sequelize-typescript';
 import { PasswordService } from './password.service';
 import { ThirdpartyapiService } from './thirdpartyapi.service';
-import winston from 'winston/lib/winston/config';
+
 import { winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
+import { CustomLogger } from '../../common/logger/logger.service';
 @Injectable()
 export class AgentService {
   constructor(
@@ -34,6 +35,7 @@ export class AgentService {
     private readonly client: ClientKafka,
     private readonly passwordService: PasswordService,
     private readonly thirdpartyService: ThirdpartyapiService,
+    private readonly logger: CustomLogger,
   ) {}
   //KAFKA CONNECT
   async onModuleInit() {
@@ -64,27 +66,41 @@ export class AgentService {
   }
 
 
-  async withdrawal(createAgentDto: CreateAgentDto) {
-    return 'WITHDRAWAL';
-  }
   async transactionService(kafkadto: KafkaDto) {
-    winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto));
+    this.logger.log('KAFKABODY: '+ JSON.stringify(kafkadto));
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
       const callingpaymentprocessor =
-        this.thirdpartyService.OffnetProcess(kafkadto);
+        await this.thirdpartyService.OffnetProcess(kafkadto);
+      this.logger.log(
+        
+        'CALLED OFFNET:'+
+        JSON.stringify(callingpaymentprocessor),
+      );
+      const kafkaresponse = this.client.emit(
+        process.env.KAFKA_NOTIFICATION_TOPIC,
+        JSON.stringify(callingpaymentprocessor),
+      );
+      this.logger.log( 'KAFKARESPONSE:'+ JSON.stringify(kafkaresponse));
+    } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
+      const callingpaymentprocessor =
+        await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
       winstonLog.log(
         'debug',
-        'CALLED OFFNET %s',
+        'CALLED OFFNET cashout  %s',
+        JSON.stringify(callingpaymentprocessor),
+      );
+      const kafkaresponse = this.client.emit(
+        process.env.KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
     } else {
       const callingpaymentprocessor =
         this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
-        winstonLog.log(
-          'debug',
-          'TRANSACTION PROCESS %s',
+     this.logger.log(
+       
+        'TRANSACTION PROCESS %s'+
         JSON.stringify(callingpaymentprocessor),
-        );
+      );
     }
   }
   // async sendService(sendUSSDDto: SendUSSDDto) {
@@ -176,5 +192,39 @@ export class AgentService {
   // }
   async offnetwithdrawal(offnetWithdrawDto: OffnetWithdrawalDto) {
     return 'offnet';
+  }
+
+  async callDailyBalanceSheetProcedure() {
+    // const CurrentDate = (datetime=new Date())=>{return datetime.toISOString().split('T')[0]}
+
+    const datetime = new Date();
+    const datetime2 = new Date();
+
+    datetime.setDate(datetime.getDate() + 1);
+
+    const CurrentDate = datetime.toISOString().split('T')[0];
+    const PastCurrentDate = datetime2.toISOString().split('T')[0];
+
+    console.log(CurrentDate);
+
+    const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `)
+
+
+    if (result[0][0]['rows'] < 1) {
+      //calling SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}'
+      winstonLog.log('info', `calling SW_JOB_PROC_DAILY_BALANCE_SHEET for balance sheet of : '${PastCurrentDate}' `);
+
+      const start_result = await this.DB.query(`INSERT INTO [dbo].[balancesheet_runtime] ([start_date_time],[input_date]) VALUES (getdate(),'${CurrentDate}');`)
+
+         await this.DB.query(
+        `EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `,
+      );
+
+      const end_result = await this.DB.query(`UPDATE [dbo].[balancesheet_runtime] SET [end_date_time] = getdate() WHERE ([dbo].[balancesheet_runtime].[input_date] = '${CurrentDate}')`)
+
+    }
+    
+
+  
   }
 }
