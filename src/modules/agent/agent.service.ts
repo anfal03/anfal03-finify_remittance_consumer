@@ -65,41 +65,42 @@ export class AgentService {
     return transectionId;
   }
 
-
   async transactionService(kafkadto: KafkaDto) {
-    this.logger.log('KAFKABODY: '+ JSON.stringify(kafkadto));
-    if (kafkadto.Keyword === process.env.OFFNET_KEY) {
-      const callingpaymentprocessor =
-        await this.thirdpartyService.OffnetProcess(kafkadto);
-      this.logger.log(
-        
-        'CALLED OFFNET:'+
-        JSON.stringify(callingpaymentprocessor),
-      );
-      const kafkaresponse = this.client.emit(
-        process.env.KAFKA_NOTIFICATION_TOPIC,
-        JSON.stringify(callingpaymentprocessor),
-      );
-      this.logger.log( 'KAFKARESPONSE:'+ JSON.stringify(kafkaresponse));
-    } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
-      const callingpaymentprocessor =
-        await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
-      winstonLog.log(
-        'debug',
-        'CALLED OFFNET cashout  %s',
-        JSON.stringify(callingpaymentprocessor),
-      );
-      const kafkaresponse = this.client.emit(
-        process.env.KAFKA_NOTIFICATION_TOPIC,
-        JSON.stringify(callingpaymentprocessor),
-      );
-    } else {
-      const callingpaymentprocessor =
-        this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
-     this.logger.log(
-       
-        'TRANSACTION PROCESS %s'+
-        JSON.stringify(callingpaymentprocessor),
+    try {
+      this.logger.log('KAFKABODY: ' + JSON.stringify(kafkadto));
+      if (kafkadto.Keyword === process.env.OFFNET_KEY) {
+        const callingpaymentprocessor =
+          await this.thirdpartyService.OffnetProcess(kafkadto);
+        this.logger.log(
+          'CALLED OFFNET:' + JSON.stringify(callingpaymentprocessor),
+        );
+        const kafkaresponse = this.client.emit(
+          process.env.KAFKA_NOTIFICATION_TOPIC,
+          JSON.stringify(callingpaymentprocessor),
+        );
+        this.logger.log('KAFKARESPONSE:' + JSON.stringify(kafkaresponse));
+      } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
+        const callingpaymentprocessor =
+          await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
+        this.logger.log(
+          `CALLED OFFNET cashout  
+          ${JSON.stringify(callingpaymentprocessor)}`,
+        );
+        const kafkaresponse = this.client.emit(
+          process.env.KAFKA_NOTIFICATION_TOPIC,
+          JSON.stringify(callingpaymentprocessor),
+        );
+      } else {
+        const callingpaymentprocessor =
+          this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
+        this.logger.log(
+          'TRANSACTION PROCESS %s' + JSON.stringify(callingpaymentprocessor),
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        'Transaction Process TransactionService:ERROR:',
+        error.message,
       );
     }
   }
@@ -207,24 +208,28 @@ export class AgentService {
 
     console.log(CurrentDate);
 
-    const result = await this.DB.query(`select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `)
-
+    const result = await this.DB.query(
+      `select count(RowId) as rows from SW_TBL_DAILY_WALLET_STATUS where DateOf > '${PastCurrentDate}' `,
+    );
 
     if (result[0][0]['rows'] < 1) {
       //calling SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}'
-      winstonLog.log('info', `calling SW_JOB_PROC_DAILY_BALANCE_SHEET for balance sheet of : '${PastCurrentDate}' `);
+      winstonLog.log(
+        'info',
+        `calling SW_JOB_PROC_DAILY_BALANCE_SHEET for balance sheet of : '${PastCurrentDate}' `,
+      );
 
-      const start_result = await this.DB.query(`INSERT INTO [dbo].[balancesheet_runtime] ([start_date_time],[input_date]) VALUES (getdate(),'${CurrentDate}');`)
+      const start_result = await this.DB.query(
+        `INSERT INTO [dbo].[balancesheet_runtime] ([start_date_time],[input_date]) VALUES (getdate(),'${CurrentDate}');`,
+      );
 
-         await this.DB.query(
+      await this.DB.query(
         `EXEC SW_JOB_PROC_DAILY_BALANCE_SHEET @EodDate = '${CurrentDate}' `,
       );
 
-      const end_result = await this.DB.query(`UPDATE [dbo].[balancesheet_runtime] SET [end_date_time] = getdate() WHERE ([dbo].[balancesheet_runtime].[input_date] = '${CurrentDate}')`)
-
+      const end_result = await this.DB.query(
+        `UPDATE [dbo].[balancesheet_runtime] SET [end_date_time] = getdate() WHERE ([dbo].[balancesheet_runtime].[input_date] = '${CurrentDate}')`,
+      );
     }
-    
-
-  
   }
 }
