@@ -10,27 +10,27 @@ const myFormat = printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
-const infotransport = new winston.transports.DailyRotateFile({
-  filename: 'info-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  dirname: `logs/`,
-  level: 'info',
-  handleExceptions: true,
-  zippedArchive: true,
-  maxSize: '20m',
-  maxFiles: '14d',
-});
+// const infotransport = new winston.transports.DailyRotateFile({
+//   filename: 'info-%DATE%.log',
+//   datePattern: 'YYYY-MM-DD',
+//   dirname: `logs/`,
+//   level: 'info',
+//   handleExceptions: true,
+//   zippedArchive: true,
+//   maxSize: '20m',
+//   maxFiles: '14d',
+// });
 
-const errortransport = new winston.transports.DailyRotateFile({
-  filename: 'error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  dirname: `logs/`,
-  level: 'error',
-  handleExceptions: true,
-  zippedArchive: true,
-  maxSize: '20m',
-  maxFiles: '14d',
-});
+// const errortransport = new winston.transports.DailyRotateFile({
+//   filename: 'error-%DATE%.log',
+//   datePattern: 'YYYY-MM-DD',
+//   dirname: `logs/`,
+//   level: 'error',
+//   handleExceptions: true,
+//   zippedArchive: true,
+//   maxSize: '20m',
+//   maxFiles: '14d',
+// });
 
 const myConfig = {
   levels: {
@@ -71,8 +71,8 @@ const winstonLogOptions = {
       level: `${myConfiglevelsKeyArray[myConfiglevelsKeyArray.length - 1]}`,
       format: combine(winston.format.colorize(), myFormat),
     }),
-    infotransport,
-    errortransport,
+    // infotransport,
+    // errortransport,
   ],
 };
 
