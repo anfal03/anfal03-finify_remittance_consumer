@@ -2,6 +2,11 @@ import { ClientKafka } from '@nestjs/microservices';
 import { winstonLog } from '../../config/winstonLog';
 import { Injectable, Inject } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
 
 @Injectable()
 export class BonuseService {
@@ -11,7 +16,7 @@ export class BonuseService {
   ) {}
   //KAFKA
   async onModuleInit() {
-    [process.env.KAFKA_REQ_TOPIC].forEach((key) =>
+    [KAFKA_REQ_TOPIC].forEach((key) =>
       this.client.subscribeToResponseOf(`${key}`),
     );
     await this.client.connect();
@@ -30,7 +35,7 @@ export class BonuseService {
     };
     winstonLog.log('debug', 'RILAC: %s', JSON.stringify(request));
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_COMMISSION_TOPIC,
+      KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
 

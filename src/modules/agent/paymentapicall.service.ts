@@ -4,6 +4,11 @@ import { Sequelize } from 'sequelize-typescript';
 import { ApiModel } from './agentbanking.interface';
 import axios from 'axios';
 
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const AUTH_MODULE = IS_CRD_PLAIN ? process.env.AUTH_MODULE : decrypt(process.env.AUTH_MODULE)
+
 
 @Injectable()
 export class PaymentApiCallService {
@@ -70,7 +75,7 @@ export class PaymentApiCallService {
           ReferenceId: Reference_ID,
         },
         headers: {
-          module: process.env.AUTH_MODULE,
+          module: AUTH_MODULE,
           'Content-type': 'application/json',
         },
         timeout: 1500,
@@ -104,7 +109,7 @@ export class PaymentApiCallService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,
@@ -131,7 +136,7 @@ export class PaymentApiCallService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,
@@ -161,7 +166,7 @@ export class PaymentApiCallService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,

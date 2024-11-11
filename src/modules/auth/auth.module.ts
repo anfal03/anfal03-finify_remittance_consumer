@@ -9,13 +9,17 @@ import { jwtConstants } from './constants';
 import { JwtStrategy } from './jwt.strategy';
 
 import 'dotenv/config';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const JWTKEY = IS_CRD_PLAIN ? process.env.JWTKEY : decrypt(process.env.JWTKEY)
 @Module({
   providers: [AuthService, ...authProviders, LocalStrategy, JwtStrategy],
   imports: [
     DatabaseModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWTKEY,
+      secret: JWTKEY,
       signOptions: { expiresIn: '120s' },
     }),
   ],

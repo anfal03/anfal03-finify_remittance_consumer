@@ -2,15 +2,20 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
+
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const JWTKEY = IS_CRD_PLAIN ? process.env.JWTKEY : decrypt(process.env.JWTKEY)
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWTKEY,
+      secretOrKey: JWTKEY,
     });
-    console.log(process.env.JWTKEY);
+    console.log(JWTKEY);
   }
 
   async validate(payload: any) {

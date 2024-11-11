@@ -9,6 +9,15 @@ import { ClientKafka } from '@nestjs/microservices';
 import { winstonLog } from '../../config/winstonLog';
 import { BonuseService } from './bonus.service';
 import { PaymentApiCallService } from './paymentapicall.service';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
+const KAFKA_ACCOUNTING_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_ACCOUNTING_TOPIC : decrypt(process.env.KAFKA_ACCOUNTING_TOPIC)
+const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
+const KAFKA_REQ_BILL_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_BILL_TOPIC : decrypt(process.env.KAFKA_REQ_BILL_TOPIC)
+const BILL_KEYWORD = process.env.BILL_KEYWORD
 
 @Injectable()
 export class PaymentService {
@@ -34,7 +43,7 @@ export class PaymentService {
   //   }
   //KAFKA
   async onModuleInit() {
-    [process.env.KAFKA_REQ_TOPIC].forEach((key) =>
+    [KAFKA_REQ_TOPIC].forEach((key) =>
       this.client.subscribeToResponseOf(`${key}`),
     );
     await this.client.connect();
@@ -171,11 +180,11 @@ export class PaymentService {
       JSON.stringify(this.notificationtemplate),
     );
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_NOTIFICATION_TOPIC,
+      KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
     const accountingresponse = await this.client.emit(
-      process.env.KAFKA_ACCOUNTING_TOPIC,
+      KAFKA_ACCOUNTING_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
     winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse);
@@ -208,7 +217,7 @@ export class PaymentService {
       JSON.stringify(this.notificationtemplate),
     );
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_NOTIFICATION_TOPIC,
+      KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
   }
@@ -239,7 +248,7 @@ export class PaymentService {
       'Messeage Send -> %s' + JSON.stringify(this.notificationtemplate),
     );
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_NOTIFICATION_TOPIC,
+      KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
     winstonLog.log('debug', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
@@ -254,7 +263,7 @@ export class PaymentService {
     };
     winstonLog.log('info', 'Messeage Send %s ', JSON.stringify(request));
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_COMMISSION_TOPIC,
+      KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
     winstonLog.log('debug', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
@@ -269,7 +278,7 @@ export class PaymentService {
     };
     winstonLog.log('info', 'Messeage Send -> %s', JSON.stringify(request));
     const kafkaresponse = this.client.emit(
-      process.env.KAFKA_COMMISSION_TOPIC,
+      KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
     );
     winstonLog.log('debug', 'KAFKARESPONSE: %s', JSON.stringify(kafkaresponse));
@@ -431,15 +440,15 @@ export class PaymentService {
                   );
                   //write to bill topic for bill call
                   if (
-                    createPaymentDto.Keyword == String(process.env.BILL_KEYWORD)
+                    createPaymentDto.Keyword == String(BILL_KEYWORD)
                   ) {
                     const kafkaresponse = this.client.emit(
-                      process.env.KAFKA_REQ_BILL_TOPIC,
+                      KAFKA_REQ_BILL_TOPIC,
                       JSON.stringify(request),
                     );
                   } else {
                     const kafkaresponse = this.client.emit(
-                      //   process.env.KAFKA_REQ_TOPIC,
+                      //   KAFKA_REQ_TOPIC,
                       createPaymentDto.Dest_Wallet_ID,
                       JSON.stringify(request),
                     );

@@ -9,6 +9,11 @@ import * as i18n from 'i18n';
 
 import 'dotenv/config';
 
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
+
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
@@ -17,7 +22,7 @@ async function bootstrap() {
       options: {
         client: {
           // clientId: 'kafka_client',
-          brokers: [process.env.KAFKA_BROKERS],
+          brokers: [KAFKA_BROKERS],
         },
         consumer: {
           groupId: process.env.KAFKA_GROUP_ID,

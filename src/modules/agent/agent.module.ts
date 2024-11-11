@@ -17,6 +17,12 @@ import { PaymentService } from './payment.service';
 import { BonuseService } from './bonus.service';
 import { PaymentApiCallService } from './paymentapicall.service';
 
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
+const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
+
 @Module({
   controllers: [AgentController],
   providers: [
@@ -44,10 +50,10 @@ import { PaymentApiCallService } from './paymentapicall.service';
           client: {
             // clientId: 'kafka_client',
             // ssl: true,
-            brokers: [process.env.KAFKA_BROKERS],
+            brokers: [KAFKA_BROKERS],
           },
           consumer: {
-            groupId: process.env.KAFKA_GROUP_ID,
+            groupId: KAFKA_GROUP_ID,
             allowAutoTopicCreation: true,
           },
           run: {

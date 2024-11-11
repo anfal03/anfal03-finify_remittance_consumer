@@ -6,6 +6,11 @@ import axios from 'axios';
 import { KafkaDto } from './dto/kafka.dto';
 import { AgentbankingService } from './agentbanking.service';
 import { PaymentService } from './payment.service';
+
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const AUTH_MODULE = IS_CRD_PLAIN ? process.env.AUTH_MODULE : decrypt(process.env.AUTH_MODULE)
 @Injectable()
 export class ThirdpartyapiService {
   constructor(
@@ -72,7 +77,7 @@ export class ThirdpartyapiService {
           ReferenceId: Reference_ID,
         },
         headers: {
-          module: process.env.AUTH_MODULE,
+          module: AUTH_MODULE,
           'Content-type': 'application/json',
         },
         timeout: 1500,
@@ -106,7 +111,7 @@ export class ThirdpartyapiService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,
@@ -133,7 +138,7 @@ export class ThirdpartyapiService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,
@@ -168,7 +173,7 @@ export class ThirdpartyapiService {
   //     method: 'POST',
   //     data: kafkaDto,
   //     headers: {
-  //       module: process.env.AUTH_MODULE,
+  //       module: AUTH_MODULE,
   //       'Content-type': 'application/json',
   //     },
   //     timeout: 3000,

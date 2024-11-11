@@ -10,6 +10,10 @@ import { DATABASE_CONNECTION } from '../../config/constants';
 import { AmlService } from './aml.service';
 import 'dotenv/config';
 import * as crypto from 'crypto';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const AUTH_MODULE = IS_CRD_PLAIN ? process.env.AUTH_MODULE : decrypt(process.env.AUTH_MODULE)
 
 @Injectable()
 export class OffnetprocessService {
@@ -17,7 +21,7 @@ export class OffnetprocessService {
     private readonly amlService: AmlService,
     @Inject(DATABASE_CONNECTION) private DB: Sequelize,
   ) {}
-  private readonly secret = process.env.AUTH_MODULE;
+  private readonly secret = AUTH_MODULE;
 
   async ProcessPayment(
     Transaction_Id: string,

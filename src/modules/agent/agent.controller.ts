@@ -7,6 +7,13 @@ import { KafkaDto } from './dto/kafka.dto';
 
 import { Kafka } from 'kafkajs';
 import { Cron } from '@nestjs/schedule';
+
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
+const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
+const KAFKA_MAIN_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_MAIN_TOPIC : decrypt(process.env.KAFKA_MAIN_TOPIC)
 @Controller('transfer')
 export class AgentController {
   private kafka: Kafka;
@@ -15,11 +22,11 @@ export class AgentController {
   constructor(private readonly agentbankingService: AgentService) {
     this.kafka = new Kafka({
       clientId: 'my-kafka-app',
-      brokers: [process.env.KAFKA_BROKERS],
+      brokers: [KAFKA_BROKERS],
     });
 
     this.consumer = this.kafka.consumer({
-      groupId: process.env.KAFKA_GROUP_ID,
+      groupId: KAFKA_GROUP_ID,
     });
   }
 
@@ -40,7 +47,7 @@ export class AgentController {
   async onModuleInit() {
     await this.consumer.connect();
     await this.consumer.subscribe({
-      topic: process.env.KAFKA_MAIN_TOPIC,
+      topic: KAFKA_MAIN_TOPIC,
       fromBeginning: true,
     });
     await this.consumer.run({

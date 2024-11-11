@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@helpers/*": [
+        "./src/helpers/*"
+      ],
+      "@config/*": [
+        "./src/config/*"
+      ]
+    }
   }
 }

@@ -7,6 +7,10 @@ import {
 import { Observable } from 'rxjs';
 import { UNAUTHORIZED } from '../../helpers/responseHelper';
 import 'dotenv/config';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const AUTH_MODULE = IS_CRD_PLAIN ? process.env.AUTH_MODULE : decrypt(process.env.AUTH_MODULE)
 
 @Injectable()
 export class AuthModuleGuard implements CanActivate {
@@ -23,7 +27,7 @@ export class AuthModuleGuard implements CanActivate {
     if (
       !headers ||
       !headers['module'] ||
-      headers['module'] != process.env.AUTH_MODULE
+      headers['module'] != AUTH_MODULE
     ) {
       throw new UnauthorizedException(UNAUTHORIZED(null, request));
     }

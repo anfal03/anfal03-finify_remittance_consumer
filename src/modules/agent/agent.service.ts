@@ -20,6 +20,11 @@ import { ThirdpartyapiService } from './thirdpartyapi.service';
 
 import { winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
+import { decrypt } from '@helpers/cipher';
+
+const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
+const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
 @Injectable()
 export class AgentService {
   constructor(
@@ -37,7 +42,7 @@ export class AgentService {
   ) {}
   //KAFKA CONNECT
   async onModuleInit() {
-    [process.env.KAFKA_REQ_TOPIC].forEach((key) =>
+    [KAFKA_REQ_TOPIC].forEach((key) =>
       this.client.subscribeToResponseOf(`${key}`),
     );
     await this.client.connect();
@@ -75,7 +80,7 @@ export class AgentService {
         JSON.stringify(callingpaymentprocessor),
       );
       const kafkaresponse = this.client.emit(
-        process.env.KAFKA_NOTIFICATION_TOPIC,
+        KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
       winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
@@ -88,7 +93,7 @@ export class AgentService {
         JSON.stringify(callingpaymentprocessor),
       );
       const kafkaresponse = this.client.emit(
-        process.env.KAFKA_NOTIFICATION_TOPIC,
+        KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
     } else {
@@ -123,7 +128,7 @@ export class AgentService {
   //     );
   //     winstonLog.log('info', 'AMLCHECK RESULT: %s', payload);
   //     const kafkaresponse = this.client.emit(
-  //       process.env.KAFKA_REQ_TOPIC,
+  //       KAFKA_REQ_TOPIC,
   //       JSON.stringify(payload),
   //     );
   //     winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
