@@ -23,8 +23,10 @@ import { KafkaDto } from './dto/kafka.dto';
 import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
-const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
-const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
+// const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+// const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
+const KAFKA_REQ_TOPIC = process.env.KAFKA_REQ_TOPIC
+const KAFKA_NOTIFICATION_TOPIC = process.env.KAFKA_NOTIFICATION_TOPIC
 @Injectable()
 export class AgentService {
   constructor(

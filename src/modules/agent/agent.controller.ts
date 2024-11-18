@@ -11,9 +11,13 @@ import { Cron } from '@nestjs/schedule';
 import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
-const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
-const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
-const KAFKA_MAIN_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_MAIN_TOPIC : decrypt(process.env.KAFKA_MAIN_TOPIC)
+// const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
+// const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
+// const KAFKA_MAIN_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_MAIN_TOPIC : decrypt(process.env.KAFKA_MAIN_TOPIC)
+
+const KAFKA_BROKERS = process.env.KAFKA_BROKERS 
+const KAFKA_GROUP_ID = process.env.KAFKA_GROUP_ID 
+const KAFKA_MAIN_TOPIC = process.env.KAFKA_MAIN_TOPIC 
 @Controller('transfer')
 export class AgentController {
   private kafka: Kafka;

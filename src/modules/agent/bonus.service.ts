@@ -5,8 +5,11 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
-const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
-const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
+// const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+// const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
+
+const KAFKA_REQ_TOPIC = process.env.KAFKA_REQ_TOPIC
+const KAFKA_COMMISSION_TOPIC = process.env.KAFKA_COMMISSION_TOPIC
 
 @Injectable()
 export class BonuseService {

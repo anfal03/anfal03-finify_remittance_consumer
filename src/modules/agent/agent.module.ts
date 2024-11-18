@@ -20,9 +20,11 @@ import { PaymentApiCallService } from './paymentapicall.service';
 import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
-const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
-const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
+// const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
+// const KAFKA_GROUP_ID = IS_CRD_PLAIN ? process.env.KAFKA_GROUP_ID : decrypt(process.env.KAFKA_GROUP_ID)
 
+const KAFKA_BROKERS = process.env.KAFKA_BROKERS
+const KAFKA_GROUP_ID = process.env.KAFKA_GROUP_ID
 @Module({
   controllers: [AgentController],
   providers: [

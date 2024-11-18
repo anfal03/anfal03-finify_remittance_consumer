@@ -12,12 +12,18 @@ import { PaymentApiCallService } from './paymentapicall.service';
 import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
-const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
-const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
-const KAFKA_ACCOUNTING_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_ACCOUNTING_TOPIC : decrypt(process.env.KAFKA_ACCOUNTING_TOPIC)
-const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
-const KAFKA_REQ_BILL_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_BILL_TOPIC : decrypt(process.env.KAFKA_REQ_BILL_TOPIC)
+// const KAFKA_REQ_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_TOPIC : decrypt(process.env.KAFKA_REQ_TOPIC)
+// const KAFKA_NOTIFICATION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_NOTIFICATION_TOPIC : decrypt(process.env.KAFKA_NOTIFICATION_TOPIC)
+// const KAFKA_ACCOUNTING_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_ACCOUNTING_TOPIC : decrypt(process.env.KAFKA_ACCOUNTING_TOPIC)
+// const KAFKA_COMMISSION_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_COMMISSION_TOPIC : decrypt(process.env.KAFKA_COMMISSION_TOPIC)
+// const KAFKA_REQ_BILL_TOPIC = IS_CRD_PLAIN ? process.env.KAFKA_REQ_BILL_TOPIC : decrypt(process.env.KAFKA_REQ_BILL_TOPIC)
 const BILL_KEYWORD = process.env.BILL_KEYWORD
+
+const KAFKA_REQ_TOPIC = process.env.KAFKA_REQ_TOPIC
+const KAFKA_NOTIFICATION_TOPIC = process.env.KAFKA_NOTIFICATION_TOPIC
+const KAFKA_ACCOUNTING_TOPIC = process.env.KAFKA_ACCOUNTING_TOPIC
+const KAFKA_COMMISSION_TOPIC = process.env.KAFKA_COMMISSION_TOPIC
+const KAFKA_REQ_BILL_TOPIC = process.env.KAFKA_REQ_BILL_TOPIC
 
 @Injectable()
 export class PaymentService {
