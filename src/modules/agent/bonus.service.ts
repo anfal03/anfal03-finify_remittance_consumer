@@ -48,15 +48,11 @@ export class BonuseService {
         transaction_id: createPaymentDto.TransactionId },
     );
 
-    // winstonLog.log('debug', 'RILAC: %s', JSON.stringify(request),
-    // { transactionid_for_log: refId, 
-    //   source: createPaymentDto.Source_Wallet_ID,
-    //   dest: createPaymentDto.Dest_Wallet_ID,
-    //   transaction_id: TransactionId });
-    // const kafkaresponse = this.client.emit(
-    //   KAFKA_COMMISSION_TOPIC,
-    //   JSON.stringify(request),
-    // );
+    const kafkaresponse = this.client.emit(
+      KAFKA_COMMISSION_TOPIC,
+      JSON.stringify(request),
+    );
+
 
   }
 }
