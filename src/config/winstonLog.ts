@@ -7,6 +7,8 @@ import { sequelizeWriteInstance as sequelize } from './sequelize-instance'; // E
 
 const { combine, timestamp, label, printf, prettyPrint,errors,colorize  } = format
 
+const filter_fields = ['password','newpassword','pin','PIN','Pin']
+
 const myFormat = printf(({ level, message, label, timestamp }) => {
 
   return `${timestamp} [${label}] ${level}: ${message}`;
@@ -115,4 +117,16 @@ export const HttpUrlLog = (message) => {
 export const HttpPortLog = (port) => {
   //log http info...
   winstonLog.log('debug','Nest Application Run In Port %s ',port, { label: 'Route' })
+ } 
+
+
+ export const LogFilter = (requestObj) => {
+  let reqobj = (typeof requestObj === 'object') ? {...requestObj} : {}
+  //filter....
+  filter_fields.map(item => {
+     if (item in reqobj) {
+      reqobj[item] = "[FILTERED]"
+     }
+  })
+  return reqobj
  } 

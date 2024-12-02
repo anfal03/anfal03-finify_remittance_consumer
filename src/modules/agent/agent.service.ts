@@ -18,7 +18,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { PasswordService } from './password.service';
 import { ThirdpartyapiService } from './thirdpartyapi.service';
 
-import { winstonLog } from 'src/config/winstonLog';
+import { LogFilter, winstonLog } from 'src/config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
 import { decrypt } from '@helpers/cipher';
 
@@ -72,7 +72,7 @@ export class AgentService {
 
 
   async transactionService(kafkadto: KafkaDto) {
-    winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto), 
+    winstonLog.log('info', 'KAFKABODY: %o', LogFilter(kafkadto), 
   { transactionid_for_log: kafkadto.refId, 
     source: kafkadto.Source_Wallet_ID,
     dest: kafkadto.Dest_Wallet_ID,
@@ -83,7 +83,7 @@ export class AgentService {
       winstonLog.log(
         'debug',
         'CALLED OFFNET %s',
-        JSON.stringify(callingpaymentprocessor),
+        callingpaymentprocessor,
         { transactionid_for_log: kafkadto.refId, 
           source: kafkadto.Source_Wallet_ID,
           dest: kafkadto.Dest_Wallet_ID,
@@ -93,18 +93,18 @@ export class AgentService {
         KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
-      winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse),
-      { transactionid_for_log: kafkadto.refId, 
-        source: kafkadto.Source_Wallet_ID,
-        dest: kafkadto.Dest_Wallet_ID,
-        transaction_id: kafkadto.TransactionId });
+      // winstonLog.log('info', 'KAFKARESPONSE:%s', kafkaresponse,
+      // { transactionid_for_log: kafkadto.refId, 
+      //   source: kafkadto.Source_Wallet_ID,
+      //   dest: kafkadto.Dest_Wallet_ID,
+      //   transaction_id: kafkadto.TransactionId });
     } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
       const callingpaymentprocessor =
         await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
       winstonLog.log(
         'debug',
         'CALLED OFFNET cashout  %s',
-        JSON.stringify(callingpaymentprocessor),
+        callingpaymentprocessor,
         { transactionid_for_log: kafkadto.refId, 
           source: kafkadto.Source_Wallet_ID,
           dest: kafkadto.Dest_Wallet_ID,
@@ -117,15 +117,15 @@ export class AgentService {
     } else {
       const callingpaymentprocessor =
         this.thirdpartyService.GetAmlConfirmResponse(kafkadto);
-      winstonLog.log(
-        'debug',
-        'TRANSACTION PROCESS %s',
-        JSON.stringify(callingpaymentprocessor),
-        { transactionid_for_log: kafkadto.refId, 
-          source: kafkadto.Source_Wallet_ID,
-          dest: kafkadto.Dest_Wallet_ID,
-          transaction_id: kafkadto.TransactionId }
-      );
+      // winstonLog.log(
+      //   'debug',
+      //   'TRANSACTION PROCESS %s',
+      //   callingpaymentprocessor,
+      //   { transactionid_for_log: kafkadto.refId, 
+      //     source: kafkadto.Source_Wallet_ID,
+      //     dest: kafkadto.Dest_Wallet_ID,
+      //     transaction_id: kafkadto.TransactionId }
+      // );
     }
   }
   // async sendService(sendUSSDDto: SendUSSDDto) {

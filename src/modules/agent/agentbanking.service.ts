@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { KafkaDto } from './dto/kafka.dto';
 
 import { DATABASE_CONNECTION } from '../../config/constants';
-import { winstonLog } from '../../config/winstonLog';
+import { LogFilter, winstonLog } from '../../config/winstonLog';
 import { Sequelize } from 'sequelize-typescript';
 import { OffnetprocessService } from './offnetprocess.service';
 import { OffnetCashOutService } from './offnetcashout.service';
@@ -110,7 +110,7 @@ export class AgentbankingService {
       winstonLog.log(
         'debug',
         'OFFNET  PROCESS: %s',
-        JSON.stringify(offnetresult),
+        offnetresult,
       );
       switch (offnetresult.Code) {
         case 104:
@@ -165,13 +165,13 @@ export class AgentbankingService {
           };
           break;
       }
-      winstonLog.log('info', 'OFFNET RESULT: %s', JSON.stringify(offnetresult));
+      winstonLog.log('info', 'OFFNET RESULT: %s', offnetresult);
       return this.notification_template;
     } else {
       winstonLog.log(
         'info',
-        'TRANSACTION REQUEST ENTRY : %s',
-        TransactionEntry,
+        'TRANSACTION REQUEST ENTRY : %o',
+        LogFilter(TransactionEntry),
       );
       this.notification_template = {
         KEYWORD: kafkadto.Keyword,

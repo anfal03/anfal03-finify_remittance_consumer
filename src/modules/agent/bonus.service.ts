@@ -39,9 +39,9 @@ export class BonuseService {
 
     winstonLog.log(
       'info',
-      'Messeage Send for RILAC bonus to topic -> %s, message -> %s',
+      'Messeage Send for RILAC bonus to topic -> %s, message -> %o',
       KAFKA_COMMISSION_TOPIC,
-      JSON.stringify(request),
+      request,
       { transactionid_for_log: refId, 
         source: createPaymentDto.Source_Wallet_ID,
         dest: createPaymentDto.Dest_Wallet_ID,

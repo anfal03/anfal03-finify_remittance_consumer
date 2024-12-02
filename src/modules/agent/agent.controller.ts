@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { AgentService } from './agent.service';
 
 import { Ctx, KafkaContext, Payload } from '@nestjs/microservices';
-import { winstonLog } from '../../config/winstonLog';
+import { LogFilter, winstonLog } from '../../config/winstonLog';
 import { KafkaDto } from './dto/kafka.dto';
 
 import { Kafka } from 'kafkajs';
@@ -43,7 +43,7 @@ export class AgentController {
     const income = context.getMessage();
 
     const kafkdto: KafkaDto = Object.assign(new KafkaDto(), income.value);
-    winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto));
+    winstonLog.log('info', 'REQUEST: %o', LogFilter(kafkdto));
     this.agentbankingService.transactionService(kafkdto);
 
     //  this.agentbankingService.transactionService(kafkdto);
@@ -82,7 +82,7 @@ export class AgentController {
             dest: dest,
             transaction_id: transactionid }
         );
-        winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto),
+        winstonLog.log('info', 'REQUEST: %o', LogFilter(kafkdto),
         { transactionid_for_log: kafkdto.refId, 
           source: source,
           dest: dest,

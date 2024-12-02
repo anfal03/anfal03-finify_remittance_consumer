@@ -43,7 +43,7 @@ export class OffnetCashOutService {
 
     //IF AML OK
     if (AML.Code == 100) {
-      winstonLog.log('info', 'AMLCHECK:%s', AML.Msg);
+      // winstonLog.log('info', 'AMLCHECK:%s', AML.Msg);
 
       switch (Flag) {
         case 'Confirm':
@@ -60,7 +60,7 @@ export class OffnetCashOutService {
       }
     } else {
       //IF AML LIMITED FAILS
-      winstonLog.log('info', 'RESPONSE:%s', AML.Msg);
+      // winstonLog.log('info', 'RESPONSE:%s', AML.Msg);
 
       return {
         TransactionId: createPaymentDto.TransactionId,

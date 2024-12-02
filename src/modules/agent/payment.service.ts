@@ -6,7 +6,7 @@ import { DATABASE_CONNECTION } from '../../config/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { Notification_Template } from './payment.interface';
 import { ClientKafka } from '@nestjs/microservices';
-import { winstonLog } from '../../config/winstonLog';
+import { LogFilter, winstonLog } from '../../config/winstonLog';
 import { BonuseService } from './bonus.service';
 import { PaymentApiCallService } from './paymentapicall.service';
 import { decrypt } from '@helpers/cipher';
@@ -117,8 +117,8 @@ export class PaymentService {
     ); // Insert Transaction request to SW_TBL_TRANSACTION_REQUEST table
     winstonLog.log(
       'info',
-      'TRANSACTION ENTRY : %s',
-      JSON.stringify(createPaymentDto),
+      'TRANSACTION ENTRY : %o',
+      LogFilter(createPaymentDto),
       { transactionid_for_log: refId, 
         source: createPaymentDto.Source_Wallet_ID,
         dest: createPaymentDto.Dest_Wallet_ID,
@@ -193,9 +193,9 @@ export class PaymentService {
     };
     winstonLog.log(
       'info',
-      'Messeage Send to topic -> %s, message -> %s',
+      'Messeage Send to topic -> %s, message -> %o',
       KAFKA_NOTIFICATION_TOPIC,
-      JSON.stringify(this.notificationtemplate),
+      this.notificationtemplate,
       { transactionid_for_log: refId, 
         source: createPaymentDto.Source_Wallet_ID,
         dest: createPaymentDto.Dest_Wallet_ID,
@@ -209,12 +209,12 @@ export class PaymentService {
       KAFKA_ACCOUNTING_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
-    winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse,
-      { transactionid_for_log: refId, 
-        source: createPaymentDto.Source_Wallet_ID,
-        dest: createPaymentDto.Dest_Wallet_ID,
-        transaction_id: createPaymentDto.TransactionId }
-    );
+    // winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse,
+    //   { transactionid_for_log: refId, 
+    //     source: createPaymentDto.Source_Wallet_ID,
+    //     dest: createPaymentDto.Dest_Wallet_ID,
+    //     transaction_id: createPaymentDto.TransactionId }
+    // );
   }
   async sendfailnotification(
     createPaymentDto: CreatePaymentDto,
@@ -336,12 +336,12 @@ export class PaymentService {
 
     //IF AML OK
     if (AML.Code == 100) {
-      winstonLog.log('info', 'AMLCHECK: %s', AML.Msg,
-        { transactionid_for_log: refId, 
-          source: createPaymentDto.Source_Wallet_ID,
-          dest: createPaymentDto.Dest_Wallet_ID,
-          transaction_id: Transaction_Id }
-      );
+      // winstonLog.log('info', 'AMLCHECK: %s', AML.Msg,
+      //   { transactionid_for_log: refId, 
+      //     source: createPaymentDto.Source_Wallet_ID,
+      //     dest: createPaymentDto.Dest_Wallet_ID,
+      //     transaction_id: Transaction_Id }
+      // );
       const AMLPERSONAL = await this.amlService.AmlCheckPersonal(
         createPaymentDto.Source_Wallet_ID,
         createPaymentDto.Dest_Wallet_ID,
@@ -360,7 +360,7 @@ export class PaymentService {
                 ),
               ),
             );
-            winstonLog.log('debug', 'TRANSACTION RESULT: %s', direct[0][0],
+            winstonLog.log('debug', 'TRANSACTION RESULT: %o', LogFilter(direct[0][0]),
               { transactionid_for_log: refId, 
                 source: createPaymentDto.Source_Wallet_ID,
                 dest: createPaymentDto.Dest_Wallet_ID,
