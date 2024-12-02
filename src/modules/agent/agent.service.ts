@@ -72,7 +72,11 @@ export class AgentService {
 
 
   async transactionService(kafkadto: KafkaDto) {
-    winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto));
+    winstonLog.log('info', 'KAFKABODY: %s', JSON.stringify(kafkadto), 
+  { transactionid_for_log: kafkadto.refId, 
+    source: kafkadto.Source_Wallet_ID,
+    dest: kafkadto.Dest_Wallet_ID,
+    transaction_id: kafkadto.TransactionId });
     if (kafkadto.Keyword === process.env.OFFNET_KEY) {
       const callingpaymentprocessor =
         await this.thirdpartyService.OffnetProcess(kafkadto);
@@ -80,12 +84,20 @@ export class AgentService {
         'debug',
         'CALLED OFFNET %s',
         JSON.stringify(callingpaymentprocessor),
+        { transactionid_for_log: kafkadto.refId, 
+          source: kafkadto.Source_Wallet_ID,
+          dest: kafkadto.Dest_Wallet_ID,
+          transaction_id: kafkadto.TransactionId }
       );
       const kafkaresponse = this.client.emit(
         KAFKA_NOTIFICATION_TOPIC,
         JSON.stringify(callingpaymentprocessor),
       );
-      winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse));
+      winstonLog.log('info', 'KAFKARESPONSE:%s', JSON.stringify(kafkaresponse),
+      { transactionid_for_log: kafkadto.refId, 
+        source: kafkadto.Source_Wallet_ID,
+        dest: kafkadto.Dest_Wallet_ID,
+        transaction_id: kafkadto.TransactionId });
     } else if (kafkadto.Keyword === process.env.OFFNET_CASHOUT) {
       const callingpaymentprocessor =
         await this.thirdpartyService.OffnetCashoutProcess(kafkadto);
@@ -93,6 +105,10 @@ export class AgentService {
         'debug',
         'CALLED OFFNET cashout  %s',
         JSON.stringify(callingpaymentprocessor),
+        { transactionid_for_log: kafkadto.refId, 
+          source: kafkadto.Source_Wallet_ID,
+          dest: kafkadto.Dest_Wallet_ID,
+          transaction_id: kafkadto.TransactionId }
       );
       const kafkaresponse = this.client.emit(
         KAFKA_NOTIFICATION_TOPIC,
@@ -105,6 +121,10 @@ export class AgentService {
         'debug',
         'TRANSACTION PROCESS %s',
         JSON.stringify(callingpaymentprocessor),
+        { transactionid_for_log: kafkadto.refId, 
+          source: kafkadto.Source_Wallet_ID,
+          dest: kafkadto.Dest_Wallet_ID,
+          transaction_id: kafkadto.TransactionId }
       );
     }
   }

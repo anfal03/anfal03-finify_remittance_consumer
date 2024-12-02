@@ -109,7 +109,7 @@ export class PaymentService {
     return payload[0][0];
   } // THIS FUNCTION DOES ENTRY OF THE TRANSACTION TO TRANSACTION REQUEST TABLE
 
-  async Transaction(createPaymentDto: CreatePaymentDto) {
+  async Transaction(createPaymentDto: CreatePaymentDto,refId) {
     //Generating Unique Transaction ID
     const Transaction = await this.TransactionEntry(
       createPaymentDto,
@@ -119,6 +119,10 @@ export class PaymentService {
       'info',
       'TRANSACTION ENTRY : %s',
       JSON.stringify(createPaymentDto),
+      { transactionid_for_log: refId, 
+        source: createPaymentDto.Source_Wallet_ID,
+        dest: createPaymentDto.Dest_Wallet_ID,
+        transaction_id: createPaymentDto.TransactionId }
     );
     //Checking if it is a special transaction or direct
     if (Transaction.ResponseCode == 100) {
@@ -134,6 +138,10 @@ export class PaymentService {
         createPaymentDto.TransactionId,
         Flag,
         Flag2,
+        { transactionid_for_log: refId, 
+          source: createPaymentDto.Source_Wallet_ID,
+          dest: createPaymentDto.Dest_Wallet_ID,
+          transaction_id: createPaymentDto.TransactionId }
       );
 
       if (Flag == 'DIRECT') {
@@ -142,12 +150,14 @@ export class PaymentService {
             createPaymentDto.TransactionId,
             createPaymentDto,
             Flag2,
+            refId
           ); //this is if payment from special merchant to customer
         } else {
           return this.ProcessPayment(
             createPaymentDto.TransactionId,
             createPaymentDto,
             Flag,
+            refId
           ); //any direct payment between customer and merchant
         }
       }
@@ -155,13 +165,14 @@ export class PaymentService {
         createPaymentDto.TransactionId,
         createPaymentDto,
         Flag,
+        refId
       ); // payment between customer to special merchant
     } else {
       return Transaction;
     }
   }
 
-  async sendsuccessnotification(createPaymentDto: CreatePaymentDto) {
+  async sendsuccessnotification(createPaymentDto: CreatePaymentDto,refId) {
     this.notificationtemplate = {
       KEYWORD: createPaymentDto.Keyword,
       TemplateID: '',
@@ -182,8 +193,13 @@ export class PaymentService {
     };
     winstonLog.log(
       'info',
-      'Messeage Send -> %s',
+      'Messeage Send to topic -> %s, message -> %s',
+      KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
+      { transactionid_for_log: refId, 
+        source: createPaymentDto.Source_Wallet_ID,
+        dest: createPaymentDto.Dest_Wallet_ID,
+        transaction_id: createPaymentDto.TransactionId },
     );
     const kafkaresponse = this.client.emit(
       KAFKA_NOTIFICATION_TOPIC,
@@ -193,11 +209,17 @@ export class PaymentService {
       KAFKA_ACCOUNTING_TOPIC,
       JSON.stringify(this.notificationtemplate),
     );
-    winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse);
+    winstonLog.log('info','KAFKA MESSAGE: %s', accountingresponse,
+      { transactionid_for_log: refId, 
+        source: createPaymentDto.Source_Wallet_ID,
+        dest: createPaymentDto.Dest_Wallet_ID,
+        transaction_id: createPaymentDto.TransactionId }
+    );
   }
   async sendfailnotification(
     createPaymentDto: CreatePaymentDto,
     NotificationFlag: string,
+    refId
   ) {
     this.notificationtemplate = {
       KEYWORD: createPaymentDto.Keyword,
@@ -219,8 +241,13 @@ export class PaymentService {
     };
     winstonLog.log(
       'info',
-      'Messeage Send -> %s',
+      'Messeage Send to topic -> %s, message -> %s',
+      KAFKA_NOTIFICATION_TOPIC,
       JSON.stringify(this.notificationtemplate),
+      { transactionid_for_log: refId, 
+        source: createPaymentDto.Source_Wallet_ID,
+        dest: createPaymentDto.Dest_Wallet_ID,
+        transaction_id: createPaymentDto.TransactionId }
     );
     const kafkaresponse = this.client.emit(
       KAFKA_NOTIFICATION_TOPIC,
@@ -294,6 +321,7 @@ export class PaymentService {
     Transaction_Id: string,
     createPaymentDto: CreatePaymentDto,
     Flag: string,
+    refId
   ) {
     //CHecking AML
 
@@ -302,16 +330,25 @@ export class PaymentService {
       createPaymentDto.Dest_Wallet_ID,
       createPaymentDto.Keyword,
       createPaymentDto.Amount,
+      refId,
+      Transaction_Id
     );
 
     //IF AML OK
     if (AML.Code == 100) {
-      winstonLog.log('info', 'AMLCHECK: %s', AML.Msg);
+      winstonLog.log('info', 'AMLCHECK: %s', AML.Msg,
+        { transactionid_for_log: refId, 
+          source: createPaymentDto.Source_Wallet_ID,
+          dest: createPaymentDto.Dest_Wallet_ID,
+          transaction_id: Transaction_Id }
+      );
       const AMLPERSONAL = await this.amlService.AmlCheckPersonal(
         createPaymentDto.Source_Wallet_ID,
         createPaymentDto.Dest_Wallet_ID,
         createPaymentDto.Keyword,
         createPaymentDto.Amount,
+        refId,
+        Transaction_Id
       );
       if (AMLPERSONAL.Code == 100) {
         switch (Flag) {
@@ -323,48 +360,57 @@ export class PaymentService {
                 ),
               ),
             );
-            winstonLog.log('debug', 'TRANSACTION RESULT: %s', direct[0][0]);
+            winstonLog.log('debug', 'TRANSACTION RESULT: %s', direct[0][0],
+              { transactionid_for_log: refId, 
+                source: createPaymentDto.Source_Wallet_ID,
+                dest: createPaymentDto.Dest_Wallet_ID,
+                transaction_id: Transaction_Id }
+            );
             if (direct[0][0].ResponseCode == 106) {
-              this.sendsuccessnotification(createPaymentDto);
-              this.bonuseservice.bonus(Transaction_Id, createPaymentDto);
+              this.sendsuccessnotification(createPaymentDto,refId);
+              this.bonuseservice.bonus(Transaction_Id, createPaymentDto,refId);
             } else {
               switch (direct[0][0].ResponseCode) {
                 case 999:
-                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                   break;
 
                 case 991:
                   this.sendfailnotification(
                     createPaymentDto,
                     'FAIL_INVALIDCODE',
+                    refId
                   );
                   break;
                 case 993:
                   this.sendfailnotification(
                     createPaymentDto,
                     'FAIL_SOURCE_DESTNATION_SAME',
+                    refId
                   );
                   break;
                 case 998:
                   this.sendfailnotification(
                     createPaymentDto,
                     'FAIL_SOURCE_DESTNATION_SAME',
+                    refId
                   );
                   break;
                 case 996:
-                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                   break;
                 case 997:
                   this.sendfailnotification(
                     createPaymentDto,
                     'FAIL_INSUFFICIENT_BALANCE',
+                    refId
                   );
                   break;
                 case 992:
-                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                   break;
                 default:
-                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
               }
             }
 
@@ -380,7 +426,12 @@ export class PaymentService {
             const data = JSON.stringify(payload);
             const objectvalue = JSON.parse(data);
 
-            winstonLog.log('debug', 'LEG1:%s', data);
+            winstonLog.log('debug', 'LEG1:%s', data,
+              { transactionid_for_log: refId, 
+                source: createPaymentDto.Source_Wallet_ID,
+                dest: createPaymentDto.Dest_Wallet_ID,
+                transaction_id: Transaction_Id }
+            );
             if (objectvalue[0][0].ResponseCode == 106) {
               const result = await this.thirdpartyService.ThirdPartyApi(
                 Transaction_Id,
@@ -389,6 +440,7 @@ export class PaymentService {
                 createPaymentDto.Dest_Wallet_ID,
                 createPaymentDto.Amount,
                 createPaymentDto.Reference_ID,
+                refId
               );
 
               if (result.ResponseCode == 0) {
@@ -399,8 +451,8 @@ export class PaymentService {
                     ),
                   ),
                 );
-                this.sendsuccessnotification(createPaymentDto);
-                this.bonuseservice.bonus(Transaction_Id, createPaymentDto);
+                this.sendsuccessnotification(createPaymentDto,refId);
+                this.bonuseservice.bonus(Transaction_Id, createPaymentDto,refId);
                 return leg2[0][0];
               } else {
                 if (result.ResponseCode == 200) {
@@ -413,9 +465,13 @@ export class PaymentService {
                     'debug',
                     'ROLLBACKLEG2:%s',
                     JSON.stringify(payload),
+                    { transactionid_for_log: refId, 
+                      source: createPaymentDto.Source_Wallet_ID,
+                      dest: createPaymentDto.Dest_Wallet_ID,
+                      transaction_id: Transaction_Id },
                   );
                   if (Number(createPaymentDto.Transaction_Fee) >= 0) {
-                    winstonLog.log('info', 'Calling Charge Roll Back');
+                    // winstonLog.log('info', 'Calling Charge Roll Back');
                     const resultcharge = await this.DB.query(
                       `EXEC SW_PROC_CHARGE_ROLLBACK_BANKING @Transaction_ID=${Transaction_Id}, @FLAG = 'LEG2'`,
                     );
@@ -423,9 +479,13 @@ export class PaymentService {
                       'info',
                       'RESPOSNE FROM CHARGE ROLLBACK: %s',
                       JSON.stringify(resultcharge),
+                      { transactionid_for_log: refId, 
+                        source: createPaymentDto.Source_Wallet_ID,
+                        dest: createPaymentDto.Dest_Wallet_ID,
+                        transaction_id: Transaction_Id }
                     );
                   }
-                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                  this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                   return {
                     TransactionId: Transaction_Id,
                     ResponseCode: 999,
@@ -486,41 +546,45 @@ export class PaymentService {
                   }
                   switch (direct[0][0].ResponseCode) {
                     case 999:
-                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                       break;
 
                     case 991:
                       this.sendfailnotification(
                         createPaymentDto,
                         'FAIL_INVALIDCODE',
+                        refId
                       );
                       break;
                     case 993:
                       this.sendfailnotification(
                         createPaymentDto,
                         'FAIL_SOURCE_DESTNATION_SAME',
+                        refId
                       );
                       break;
                     case 998:
                       this.sendfailnotification(
                         createPaymentDto,
                         'FAIL_SOURCE_DESTNATION_SAME',
+                        refId
                       );
                       break;
                     case 996:
-                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                       break;
                     case 997:
                       this.sendfailnotification(
                         createPaymentDto,
                         'FAIL_INSUFFICIENT_BALANCE',
+                        refId
                       );
                       break;
                     case 992:
-                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                       break;
                     default:
-                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL');
+                      this.sendfailnotification(createPaymentDto, 'FAIL_ALL',refId);
                   }
                   return {
                     TransactionId: Transaction_Id,
@@ -538,18 +602,21 @@ export class PaymentService {
             this.sendfailnotification(
               createPaymentDto,
               'FAIL_SERVICE_NOT_ALLOWED',
+              refId
             );
             break;
           case 998:
             this.sendfailnotification(
               createPaymentDto,
               'FAIL_AML_EXCEEDS_DESTINATION',
+              refId
             );
             break;
           case 999:
             this.sendfailnotification(
               createPaymentDto,
               'FAIL_AML_EXCEEDS_SOURCE',
+              refId
             );
             break;
         }
@@ -567,18 +634,21 @@ export class PaymentService {
           this.sendfailnotification(
             createPaymentDto,
             'FAIL_SERVICE_NOT_ALLOWED',
+            refId
           );
           break;
         case 998:
           this.sendfailnotification(
             createPaymentDto,
             'FAIL_AML_EXCEEDS_DESTINATION',
+            refId
           );
           break;
         case 999:
           this.sendfailnotification(
             createPaymentDto,
             'FAIL_AML_EXCEEDS_SOURCE',
+            refId
           );
           break;
       }

@@ -161,7 +161,7 @@ export class ThirdpartyapiService {
   // }
 
   async GetAmlConfirmResponse(kafkaDto: KafkaDto){
-    return this.paymentService.Transaction(kafkaDto);
+    return this.paymentService.Transaction(kafkaDto,kafkaDto.refId);
   }
 
   async OffnetProcess(kafkaDto: KafkaDto) {

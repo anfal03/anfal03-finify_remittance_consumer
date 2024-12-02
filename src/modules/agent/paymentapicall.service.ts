@@ -5,6 +5,7 @@ import { ApiModel } from './agentbanking.interface';
 import axios from 'axios';
 
 import { decrypt } from '@helpers/cipher';
+import { winstonLog } from '@config/winstonLog';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
 const AUTH_MODULE = IS_CRD_PLAIN ? process.env.AUTH_MODULE : decrypt(process.env.AUTH_MODULE)
@@ -57,12 +58,21 @@ export class PaymentApiCallService {
     Dest_Wallet_ID: string,
     Amount: string,
     Reference_ID: string,
+    refId:string
   ): Promise<ApiModel> {
     const payload = await this.CheckServiceUrl(
       Source_Wallet_ID,
       Dest_Wallet_ID,
     );
-    this.logger.debug('SERVICECHECKRESULT:', JSON.stringify(payload));
+    // this.logger.debug('SERVICECHECKRESULT:', JSON.stringify(payload));
+
+    winstonLog.log('debug', 'SERVICECHECKRESULT: %s', JSON.stringify(payload),
+      { transactionid_for_log: refId, 
+        source: Source_Wallet_ID,
+        dest: Dest_Wallet_ID,
+        transaction_id: Transaction_Id }
+    );
+
     if (payload.RESPONSECODE == 100) {
       return await axios({
         url: `${payload.SERVICEURL}`,

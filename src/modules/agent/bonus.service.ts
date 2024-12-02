@@ -28,7 +28,7 @@ export class BonuseService {
   async onModuleDestroy() {
     await this.client.close();
   }
-  async bonus(TransactionId: string, createPaymentDto: CreatePaymentDto) {
+  async bonus(TransactionId: string, createPaymentDto: CreatePaymentDto,refId) {
     const request = {
       TransactionId: createPaymentDto.TransactionId,
       Msisdn: createPaymentDto.Source_Wallet_ID,
@@ -36,11 +36,27 @@ export class BonuseService {
       Amount: createPaymentDto.Amount,
       Keyword: createPaymentDto.Keyword,
     };
-    winstonLog.log('debug', 'RILAC: %s', JSON.stringify(request));
-    const kafkaresponse = this.client.emit(
+
+    winstonLog.log(
+      'info',
+      'Messeage Send for RILAC bonus to topic -> %s, message -> %s',
       KAFKA_COMMISSION_TOPIC,
       JSON.stringify(request),
+      { transactionid_for_log: refId, 
+        source: createPaymentDto.Source_Wallet_ID,
+        dest: createPaymentDto.Dest_Wallet_ID,
+        transaction_id: createPaymentDto.TransactionId },
     );
+
+    // winstonLog.log('debug', 'RILAC: %s', JSON.stringify(request),
+    // { transactionid_for_log: refId, 
+    //   source: createPaymentDto.Source_Wallet_ID,
+    //   dest: createPaymentDto.Dest_Wallet_ID,
+    //   transaction_id: TransactionId });
+    // const kafkaresponse = this.client.emit(
+    //   KAFKA_COMMISSION_TOPIC,
+    //   JSON.stringify(request),
+    // );
 
   }
 }

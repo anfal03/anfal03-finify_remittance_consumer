@@ -27,6 +27,7 @@ export class OffnetprocessService {
     Transaction_Id: string,
     createPaymentDto: KafkaDto,
     Flag: string,
+    refId
   ) {
     //CHecking AML
     const OTP = this.encryptPassword(createPaymentDto.OTP);
@@ -35,6 +36,8 @@ export class OffnetprocessService {
       createPaymentDto.Dest_Wallet_ID,
       createPaymentDto.Keyword,
       createPaymentDto.Amount,
+      refId,
+      Transaction_Id
     );
 
     //IF AML OK

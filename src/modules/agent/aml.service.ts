@@ -12,12 +12,18 @@ export class AmlService {
     Dest_Wallet_ID: string,
     Keyword: string,
     Amount: string,
+    refId: string,
+    Transaction_Id : string
   ): Promise<AmlModel> {
     const payload = await this.DB.query(
       `EXEC dbo.SW_PROC_AML_CHECK @MSISDN = ${Source_Wallet_ID},@Keyword = ${Keyword} ,@Amount = ${Amount} , @Dest_Wallet_ID = ${Dest_Wallet_ID}   `,
     );
     const data = JSON.parse(JSON.stringify(payload));
-    winstonLog.log('debug','GLOBAL AML CHECK: %s', JSON.stringify(payload));
+    winstonLog.log('debug','GLOBAL AML CHECK: %s', JSON.stringify(payload),
+    { transactionid_for_log: refId, 
+      source: Source_Wallet_ID,
+      dest: Dest_Wallet_ID,
+      transaction_id: Transaction_Id });
     return data[0][0];
   }
 
@@ -26,12 +32,19 @@ export class AmlService {
     Dest_Wallet_ID: string,
     Keyword: string,
     Amount: string,
+    refId: string,
+    Transaction_Id : string
   ): Promise<AmlModel> {
     const payload = await this.DB.query(
       `EXEC dbo.SW_PROC_AML_CHECK_PERSONAL @MSISDN = ${Source_Wallet_ID},@Keyword = ${Keyword} ,@Amount = ${Amount} , @Dest_Wallet_ID = ${Dest_Wallet_ID}   `,
     );
     const data = JSON.parse(JSON.stringify(payload));
-    winstonLog.log('debug','PERSONAL AML CHECK: %s', JSON.stringify(payload));
+    winstonLog.log('debug','PERSONAL AML CHECK: %s', JSON.stringify(payload),
+    { transactionid_for_log: refId, 
+      source: Source_Wallet_ID,
+      dest: Dest_Wallet_ID,
+      transaction_id: Transaction_Id }
+    );
     return data[0][0];
   }
 }

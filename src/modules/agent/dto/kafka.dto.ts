@@ -44,4 +44,7 @@ export class KafkaDto {
   @IsOptional()
   @ApiProperty()
   readonly OTP: string;
+  @IsOptional()
+  @ApiProperty()
+  readonly refId: string;
 }

@@ -36,6 +36,9 @@ export class OffnetCashOutService {
       createPaymentDto.Dest_Wallet_ID,
       createPaymentDto.Keyword,
       createPaymentDto.Amount,
+      createPaymentDto.refId,
+      createPaymentDto.TransactionId
+
     );
 
     //IF AML OK

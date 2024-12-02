@@ -38,6 +38,7 @@ export class AgentController {
   async readMessage(
     @Payload() payload: any,
     @Ctx() context: KafkaContext,
+
   ): Promise<void> {
     const income = context.getMessage();
 
@@ -60,14 +61,32 @@ export class AgentController {
 
         // console.log({ topic, partition, message });
 
-        winstonLog.log('info','topic %s:', topic);
+        let source = null
+        let dest = null
+        let transactionid = null
+        console.log(`topic : ${topic}`, );
         console.log(`partition : ${partition}`);
         console.log(`message : `);
         const buf = JSON.parse(message.value);
         console.log(buf);
 
         const kafkdto: KafkaDto = Object.assign(new KafkaDto(), buf);
-        winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto));
+        source = kafkdto.Source_Wallet_ID
+        dest = kafkdto.Dest_Wallet_ID
+        transactionid = kafkdto.TransactionId
+                // console.log({ topic, partition, message });
+
+        winstonLog.log('info', `topic: ${topic} , partition: ${partition} , message: ${message}`,
+          { transactionid_for_log: kafkdto.refId, 
+            source: source,
+            dest: dest,
+            transaction_id: transactionid }
+        );
+        winstonLog.log('info', 'REQUEST: %s', JSON.stringify(kafkdto),
+        { transactionid_for_log: kafkdto.refId, 
+          source: source,
+          dest: dest,
+          transaction_id: transactionid });
         await this.consumer.commitOffsets([
           {
             topic,
