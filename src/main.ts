@@ -13,6 +13,7 @@ import { decrypt } from '@helpers/cipher';
 
 const IS_CRD_PLAIN = process.env.IS_CRD_PLAIN == 'true' ? true : false
 const KAFKA_BROKERS =  process.env.KAFKA_BROKERS 
+console.log('KAFKA_BROKERS => ', KAFKA_BROKERS)
 // const KAFKA_BROKERS = IS_CRD_PLAIN ? process.env.KAFKA_BROKERS : decrypt(process.env.KAFKA_BROKERS)
 
 async function bootstrap() {

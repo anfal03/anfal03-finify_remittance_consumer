@@ -7,12 +7,33 @@ import { sequelizeWriteInstance as sequelize } from './sequelize-instance'; // E
 
 const { combine, timestamp, label, printf, prettyPrint,errors,colorize  } = format
 
-const filter_fields = ['password','newpassword','pin','PIN','Pin']
+const filter_fields = ['password','newpassword', 'pin', 'PIN', 'Pin','cvc', 'userName', 'passWord', 'cardNumber', 'cavv', 'expiry', 'CAVV']
 
 const myFormat = printf(({ level, message, label, timestamp }) => {
 
   return `${timestamp} [${label}] ${level}: ${message}`;
 })
+
+  // Custom formatter to sanitize sensitive data
+  const filterSensitiveData = format((info) => {
+    // Check if interpolation arguments exist
+    const splatArgs = info[Symbol.for('splat')];
+    if (Array.isArray(splatArgs)) {
+      // Sanitize each argument in the splat array
+      const sanitizedArgs = splatArgs.map((arg) => {
+        if (typeof arg === 'object' && arg !== null) {
+          const sanitized = { ...arg };
+          filter_fields.forEach((key) => {
+            if (sanitized[key]) sanitized[key] = '[FILTERED]';
+          });
+          return sanitized;
+        }
+        return arg;
+      });
+      info[Symbol.for('splat')] = sanitizedArgs;
+    }
+    return info;
+  });
 
 const infotransport = new DailyRotateFile({
                     filename: 'info-%DATE%.log',
@@ -68,10 +89,16 @@ const winstonLogOptions = {
           format: combine(
             label({ label: 'app' }),    
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), 
+            filterSensitiveData(),
             format.splat(),
             format.simple(),
+            format((info) => {
+              // Attach transaction ID from request context or default if not available
+              info.transactionid_for_log = info.transactionid_for_log || 'N/A';
+              return info
+            })(),
             myFormat,
-          ), 
+          ),  
           transports: [
             new transports.Console({
               level : `${myConfiglevelsKeyArray[myConfiglevelsKeyArray.length - 1]}`,
@@ -95,7 +122,6 @@ export const requestBodyLog = (requestObj) => {
 
   let reqobj = {...requestObj}
   //filter....
-  const filter_fields = ['password','newpassword','pin','PIN','Pin']
   filter_fields.map(item => {
      if (item in reqobj) {
       reqobj[item] = "[FILTERED]"

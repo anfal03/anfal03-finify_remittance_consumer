@@ -32,15 +32,18 @@ export const databaseProviders = [
       }
       const sequelize = new Sequelize(config);
       sequelize.addModels(Object.values(models));
+
+      const loggingdata = {
+        HOST: config.host,
+        PORT: config.port,
+      };
+      console.log(loggingdata);
+
       //Check connection establish or not......
       sequelize
         .authenticate()
         .then(function () {
-          const loggingdata = {
-            HOST: config.host,
-            PORT: config.port,
-          };
-          console.log(loggingdata);
+          // console.log(loggingdata);
           console.log(`${config.database} DB CONNECTED!`);
         })
         .catch(function (err) {
@@ -48,7 +51,7 @@ export const databaseProviders = [
             HOST: config.host,
             PORT: config.port,
           };
-          console.log(loggingdata);
+          // console.log(loggingdata);
           console.log(`${config.database} DB Connection Error !!`);
           console.log(err);
         });
