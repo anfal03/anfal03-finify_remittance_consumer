@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ sheba-prod ]
+    branches: [ sheba ]
   pull_request:
-    branches: [ sheba-prod ]
+    branches: [ sheba ]
 
 jobs:
 
