@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  finify_remittance_consumer:
+    container_name: finify_remittance_consumer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: finify_remittance_consumer
+    ports:
+      - "3000:5001"
+    # restart: always
