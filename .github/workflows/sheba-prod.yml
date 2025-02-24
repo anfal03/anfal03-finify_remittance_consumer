@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ sheba ]
+    branches: [ sheba-prod ]
   pull_request:
-    branches: [ sheba ]
+    branches: [ sheba-prod ]
 
 jobs:
 
@@ -16,6 +16,34 @@ jobs:
 
       - name: Check Out Repo 
         uses: actions/checkout@v2
+        
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and Run Docker Compose (Test Locally)
+        run: |
+          docker-compose up -d --build
+          sleep 20  # Increased time for service to start
+
+      - name: Debug Running Containers
+        run: docker ps -a
+
+      - name: Print Service Logs
+        run: docker logs app_version_control_service
+
+      # - name: Health Check (Ensure Service is Running)
+      #   run: |
+      #     curl -f http://localhost:5041 || exit 1
+
+      - name: Stop and Clean Up
+        run: docker-compose down
+
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
