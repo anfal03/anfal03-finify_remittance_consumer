@@ -8,5 +8,5 @@ services:
       dockerfile: Dockerfile
     hostname: finify_remittance_consumer
     ports:
-      - "3000:5001"
+      - "3000:5009"
     # restart: always
